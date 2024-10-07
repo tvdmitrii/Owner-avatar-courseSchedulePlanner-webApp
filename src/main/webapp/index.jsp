@@ -19,9 +19,12 @@
 <main class="flex-shrink-0">
     <div id="course-list" class="mx-auto my-5">
         <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                IT 101: Intro To Db
-            </li>
+            <c:forEach var="course" items="${courses}">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${course.code}: ${course.title}
+                </li>
+            </c:forEach>
+
         </ul>
     </div>
 </main>
