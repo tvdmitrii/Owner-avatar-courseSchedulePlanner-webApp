@@ -11,7 +11,7 @@ import javax.servlet.annotation.*;
 
 
 @WebServlet(
-        name = "courseServlet",
+        name = "CourseServlet",
         urlPatterns = { "/courseServlet" }
 )
 public class CourseServlet extends HttpServlet {
