@@ -12,14 +12,11 @@
     <env>dev</env>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>11</maven.compiler.release>
-    <junit.version>4.12</junit.version>
-    <junit-vintage-version>4.12.0</junit-vintage-version>
+    <junit.version>5.11.2</junit.version>
+    <jersey.version>2.45</jersey.version>
+    <log4j.version>2.24.1</log4j.version>
     <javax.version>7.0</javax.version>
     <jstl-version>1.2</jstl-version>
-    <log4j-version>2.10.0</log4j-version>
-    <jupiter-version>5.0.0</jupiter-version>
-    <jersey-version>2.45</jersey-version>
-    <junit-platform-runner-version>1.0.0</junit-platform-runner-version>
     <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
     <maven-surefire-plugin-version>2.19</maven-surefire-plugin-version>
   </properties>
@@ -44,21 +41,36 @@
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>${jersey-version}</version>
+        <version>${jersey.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-bom</artifactId>
+        <version>${log4j.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
+    <!-- REST API interface definition package. -->
     <dependency>
       <groupId>com.turygin</groupId>
       <artifactId>course-schedule-planner-api-interface</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-    <!-- Jersey packages -->
+    <!-- Jersey REST API packages. -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet-core</artifactId>
@@ -68,33 +80,17 @@
       <artifactId>jersey-hk2</artifactId>
     </dependency>
     <dependency>
+      <!-- Adds JSON support for Jersey. -->
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-binding</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-runner</artifactId>
-      <version>${junit-platform-runner-version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <version>${junit-vintage-version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- JUnit unit testing package. -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${jupiter-version}</version>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- Java EE packages. -->
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>
@@ -105,16 +101,14 @@
       <artifactId>jstl</artifactId>
       <version>${jstl-version}</version>
     </dependency>
-    <!-- next 2 dependencies are for log4j -->
+    <!-- log4j logging packages. -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j-version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>${log4j-version}</version>
     </dependency>
   </dependencies>
 
@@ -141,13 +135,6 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin-version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-surefire-provider</artifactId>
-              <version>${junit-platform-runner-version}</version>
-            </dependency>
-          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
