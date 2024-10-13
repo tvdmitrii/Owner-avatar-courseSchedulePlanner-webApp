@@ -24,7 +24,6 @@
                     ${course.code}: ${course.title}
                 </li>
             </c:forEach>
-
         </ul>
     </div>
 </main>
