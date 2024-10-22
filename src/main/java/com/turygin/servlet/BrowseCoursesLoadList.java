@@ -1,7 +1,7 @@
 package com.turygin.servlet;
 
 import com.turygin.api.client.RestClient;
-import com.turygin.api.model.CourseDTO;
+import com.turygin.api.model.CourseBasicDTO;
 
 import java.io.*;
 import java.util.List;
@@ -15,13 +15,15 @@ import javax.servlet.annotation.*;
  * REST API and sends it to JSP for display.
  */
 @WebServlet(
-        name = "CourseServlet",
-        urlPatterns = { "/courseServlet" }
+        name = "BrowseCoursesLoadList",
+        urlPatterns = { "/browseCoursesLoadList" }
 )
-public class CourseServlet extends HttpServlet {
+public class BrowseCoursesLoadList extends HttpServlet {
+
+    private static final String JSP_URL = "/browseCourses.jsp";
 
     /** Empty constructor. */
-    public CourseServlet() {}
+    public BrowseCoursesLoadList() {}
 
     /**
      * Handles HTTP GET requests.
@@ -33,13 +35,16 @@ public class CourseServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+
         RestClient client = new RestClient();
-        List<CourseDTO> courses = client.getAllCourses();
-        request.setAttribute("courses", courses);
+        List<CourseBasicDTO> courses = client.getAllCourses();
 
-        String url = "/index.jsp";
+        HttpSession session = request.getSession();
+        session.setAttribute("browseCourseList", courses);
+        session.setAttribute("browseSelectedCourse", null);
+        session.setAttribute("browseSelectedCourseIndex", null);
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
         dispatcher.forward(request, response);
     }
 }

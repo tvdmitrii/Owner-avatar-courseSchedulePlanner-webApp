@@ -1,5 +1,67 @@
+html {
+    height: 100%;
+}
+
+body {
+    flex-flow: column nowrap;
+    height: 100%;
+}
+
+header {
+    flex: 1 1 0;
+    flex-flow: column nowrap;
+}
+
+#header-title {
+    flex: 1 1 0;
+    justify-content: center;
+}
+
+#header-nav {
+    flex: 1 1 0;
+    flex-flow: row nowrap;
+}
+
+footer {
+    flex: 1 1 0;
+}
+
+main {
+    flex-flow: row nowrap;
+    justify-content: space-evenly;
+    flex: 14 1 0;
+    gap: 1rem;
+}
+
+#course-search-section {
+    flex: 1 1 0;
+}
+
+#course-list-section {
+    flex: 1 1 0;
+}
+
+#course-description-section {
+    flex: 3 1 0;
+}
+
+#course-list-card-body {
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: stretch;
+    gap: 2rem;
+    flex: 1 1 1px;
+}
+
+#course-list ul {
+    flex: 1 1 1px;
+}
+
 #course-list {
-    width: 60%;
-    max-width: 400px;
-    min-width: 200px;
+    display: flex;
+    flex: 1 1 1px;
+}
+
+#course-list-pagination {
+    margin: auto;
 }

@@ -4,7 +4,7 @@
          version="3.1">
   <display-name>Course Schedule Planner</display-name>
   <servlet-mapping>
-    <servlet-name>CourseServlet</servlet-name>
+    <servlet-name>BrowseCoursesLoadList</servlet-name>
     <url-pattern></url-pattern>
   </servlet-mapping>
 </web-app>

@@ -5,8 +5,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
-import com.turygin.api.model.CourseDTO;
-import com.turygin.api.repository.ICourseRepository;
+import com.turygin.api.model.CourseBasicDTO;
+import com.turygin.api.resource.ICourseResource;
 import com.turygin.utility.Config;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * REST API client that implements ICourseRepository interface.
  */
-public class RestClient implements ICourseRepository {
+public class RestClient implements ICourseResource {
     private static final Properties API_PROPS = Config.getProperties();
     private final Client client = ClientBuilder.newClient();
 
@@ -32,15 +32,17 @@ public class RestClient implements ICourseRepository {
      * @param id unique course ID
      * @return course information
      */
-    public CourseDTO getCourse(long id) {
-        return client.target(getCourseUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).get(CourseDTO.class);
+    public CourseBasicDTO getCourse(long id) {
+        return client.target(getCourseUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).
+                get(CourseBasicDTO.class);
     }
 
     /**
      * Fetches information about all courses as a list.
      * @return a list of course information objects
      */
-    public List<CourseDTO> getAllCourses() {
-        return client.target(getCourseUrl()).request(MediaType.APPLICATION_JSON).get(new GenericType<List<CourseDTO>>() {});
+    public List<CourseBasicDTO> getAllCourses() {
+        return client.target(getCourseUrl()).request(MediaType.APPLICATION_JSON).
+                get(new GenericType<List<CourseBasicDTO>>() {});
     }
 }
