@@ -7,24 +7,28 @@ import javax.ws.rs.core.MediaType;
 
 import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.api.resource.ICourseResource;
-import com.turygin.utility.Config;
 
 import java.util.List;
-import java.util.Properties;
 
 /**
  * REST API client that implements ICourseRepository interface.
  */
 public class RestClient implements ICourseResource {
-    private static final Properties API_PROPS = Config.getProperties();
-    private final Client client = ClientBuilder.newClient();
+
+    private final String baseUrl;
+    private final Client client;
+
+    public RestClient(String baseUrl) {
+        this.baseUrl = baseUrl;
+        client = ClientBuilder.newClient();
+    }
 
     /**
      * Helper method that constructs URL for course endpoints.
      * @return URL for course endpoints
      */
-    private static String getCourseUrl() {
-        return String.format("%s/%s", API_PROPS.getProperty("rest.client.baseUrl"), "course");
+    private String getCourseUrl() {
+        return String.format("%s/%s", baseUrl, "course");
     }
 
     /**

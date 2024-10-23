@@ -35,8 +35,10 @@ public class BrowseCoursesLoadList extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Fetch REST API client from the context
+        ServletContext context = getServletContext();
+        RestClient client = (RestClient) context.getAttribute("restClient");
 
-        RestClient client = new RestClient();
         List<CourseBasicDTO> courses = client.getAllCourses();
 
         HttpSession session = request.getSession();
