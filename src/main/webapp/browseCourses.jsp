@@ -11,6 +11,7 @@
         <title>Course Schedule Planner</title>
     </head>
     <body class="d-flex">
+        <jsp:useBean id="browseCoursesPage" class="com.turygin.states.BrowseCoursesPageState" />
         <c:import url="/templates/header.jsp"/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
@@ -37,30 +38,28 @@
             </div>
             <div id="course-list-section" class="card d-flex my-3 p-3">
                 <h5 class="card-header">Results</h5>
-                <div id="course-list-card-body" class="card-body">
-                    <div id="course-list" class="overflow-auto">
-                        <ul class="list-group align-content-stretch">
-                            <c:forEach var="course" items="${browseCoursesPage.loadedCourses}" varStatus="loop">
-                                <a href="${pageContext.request.contextPath}/browseCoursesSelectCourse?courseListId=${loop.index}"
-                                   class="list-group-item ${browseCoursesPage.hasSelectedCourse && course.id == browseCoursesPage.selectedCourse.id ? "active" : ""}">
-                                        ${course.code}: ${course.title}
-                                </a>
-                            </c:forEach>
-                        </ul>
-                    </div>
-                    <!--
-                    <div id="course-list-pagination">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                            </ul>
-                        </nav>
-                    </div>-->
-                </div>
+                <c:choose>
+                    <c:when test="${browseCoursesPage.hasLoadedCourses}">
+                        <div id="course-list-card-body" class="card-body">
+                            <div id="course-list" class="overflow-auto">
+                                <ul class="list-group align-content-stretch">
+                                    <c:forEach var="course" items="${browseCoursesPage.loadedCourses}" varStatus="loop">
+                                        <a href="${pageContext.request.contextPath}/browseCoursesSelectCourse?courseListId=${loop.index}"
+                                           class="list-group-item ${browseCoursesPage.hasSelectedCourse
+                                                && course.id == browseCoursesPage.selectedCourse.id ? "active" : ""}">
+                                                ${course.code}: ${course.title}
+                                        </a>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="card-body d-flex justify-content-center">
+                            <h4 class="card-title mt-1 d-flex align-self-center">No Results.</h4>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
             <div id="course-description-section" class="card d-flex my-3 me-3 p-3">
                 <h5 class="card-header">Course Description</h5>
@@ -76,8 +75,8 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <div class="card-body">
-                            <h4 class="card-title mt-1">No Course Selected.</h4>
+                        <div class="card-body d-flex justify-content-center">
+                            <h4 class="card-title mt-1 d-flex align-self-center">No Course Selected.</h4>
                         </div>
                     </c:otherwise>
                 </c:choose>
