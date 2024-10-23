@@ -2,6 +2,7 @@ package com.turygin.servlet;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
+import com.turygin.states.BrowseCoursesPageState;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -40,10 +41,11 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
             throws ServletException, IOException {
 
         int courseListId = Integer.parseInt(request.getParameter("id"));
+
+        // Select a course from the list
         HttpSession session = request.getSession();
-        List<CourseBasicDTO> courses = (List<CourseBasicDTO>) session.getAttribute("browseCourseList");
-        session.setAttribute("browseSelectedCourse", courses.get(courseListId));
-        session.setAttribute("browseSelectedCourseIndex", courseListId);
+        BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
+        pageState.setSelectedCourse(pageState.getLoadedCourses().get(courseListId));
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
         dispatcher.forward(request, response);

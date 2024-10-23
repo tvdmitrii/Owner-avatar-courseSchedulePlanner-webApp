@@ -2,6 +2,7 @@ package com.turygin.servlet;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
+import com.turygin.states.BrowseCoursesPageState;
 
 import java.io.*;
 import java.util.List;
@@ -39,12 +40,14 @@ public class BrowseCoursesLoadList extends HttpServlet {
         ServletContext context = getServletContext();
         RestClient client = (RestClient) context.getAttribute("restClient");
 
+        // Fetch course info from the API
         List<CourseBasicDTO> courses = client.getAllCourses();
 
+        // Initialize page state and save it in session
         HttpSession session = request.getSession();
-        session.setAttribute("browseCourseList", courses);
-        session.setAttribute("browseSelectedCourse", null);
-        session.setAttribute("browseSelectedCourseIndex", null);
+        BrowseCoursesPageState pageState = new BrowseCoursesPageState();
+        pageState.setLoadedCourses(courses);
+        session.setAttribute("browseCoursesPage", pageState);
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
         dispatcher.forward(request, response);
