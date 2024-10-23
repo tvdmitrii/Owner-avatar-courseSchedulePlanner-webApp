@@ -41,7 +41,7 @@
                     <div id="course-list" class="overflow-auto">
                         <ul class="list-group align-content-stretch">
                             <c:forEach var="course" items="${browseCoursesPage.loadedCourses}" varStatus="loop">
-                                <a href="${pageContext.request.contextPath}/browseCoursesSelectCourse?id=${loop.index}"
+                                <a href="${pageContext.request.contextPath}/browseCoursesSelectCourse?courseListId=${loop.index}"
                                    class="list-group-item ${browseCoursesPage.hasSelectedCourse && course.id == browseCoursesPage.selectedCourse.id ? "active" : ""}">
                                         ${course.code}: ${course.title}
                                 </a>

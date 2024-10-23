@@ -26,6 +26,7 @@ import java.util.List;
 public class BrowseCoursesSelectCourse extends HttpServlet {
 
     private static final String JSP_URL = "/browseCourses.jsp";
+    private static final String BROWSE_COURSES_LOAD_SERVLET = "";
 
     /** Empty constructor. */
     public BrowseCoursesSelectCourse() {}
@@ -40,12 +41,24 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int courseListId = Integer.parseInt(request.getParameter("id"));
-
-        // Select a course from the list
+        // Get page state
         HttpSession session = request.getSession();
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
-        pageState.setSelectedCourse(pageState.getLoadedCourses().get(courseListId));
+
+        if (pageState == null) {
+            // Should not be here yet. Course list was not initialized.
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), BROWSE_COURSES_LOAD_SERVLET));
+            return;
+        }
+
+        try {
+            // Select a course from the list if the index is valid ...
+            int courseListId = Integer.parseInt(request.getParameter("courseListId"));
+            pageState.setSelectedCourse(pageState.getLoadedCourses().get(courseListId));
+        } catch (Exception e) {
+            // ... or remove selection
+            pageState.setSelectedCourse(null);
+        }
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
         dispatcher.forward(request, response);
