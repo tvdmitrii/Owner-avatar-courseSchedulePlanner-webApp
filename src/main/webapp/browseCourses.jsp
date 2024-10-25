@@ -16,20 +16,23 @@
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
                 <h5 class="card-header">Search Tools</h5>
                 <div class="card-body">
-                    <p class="card-text">Not yet functional!</p>
-                    <form>
+                    <form action="${pageContext.request.contextPath}/browseCoursesSearch" method="GET">
                         <div class="mb-3">
                             <label for="department-input" class="form-label">Department</label>
-                            <select class="form-select" id="department-input" name="department">
-                                <option selected>Select Department</option>
-                                <option value="1">Computer Science</option>
-                                <option value="2">Engineering</option>
-                                <option value="3">English</option>
+                            <select class="form-select" id="department-input" name="departmentListId">
+                                <option ${!browseCoursesPage.hasSelectedDepartment ? "selected" : ""}>Select Department</option>
+                                <c:forEach var="department" items="${browseCoursesPage.loadedDepartments}" varStatus="loop">
+                                    <option
+                                        ${browseCoursesPage.hasSelectedDepartment
+                                        && department.id == browseCoursesPage.selectedDepartment.id ? "selected" : ""}
+                                            value="${loop.index}">${department.name}</option>
+                                </c:forEach>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="course-title-input" class="form-label">Course Title</label>
-                            <input type="text" class="form-control" id="course-title-input">
+                            <input type="text" class="form-control" id="course-title-input" name="title"
+                                value="${browseCoursesPage.hasTitleSearchTerm ? browseCoursesPage.titleSearchTerm : ""}">
                         </div>
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
