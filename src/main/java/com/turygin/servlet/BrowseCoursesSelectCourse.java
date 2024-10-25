@@ -26,7 +26,7 @@ import java.util.List;
 public class BrowseCoursesSelectCourse extends HttpServlet {
 
     private static final String JSP_URL = "/browseCourses.jsp";
-    private static final String BROWSE_COURSES_LOAD_SERVLET = "";
+    private static final String BROWSE_COURSES_LOAD_SERVLET = "browseCoursesLoadList";
 
     /** Empty constructor. */
     public BrowseCoursesSelectCourse() {}

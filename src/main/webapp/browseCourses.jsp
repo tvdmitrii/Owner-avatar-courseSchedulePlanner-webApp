@@ -11,7 +11,6 @@
         <title>Course Schedule Planner</title>
     </head>
     <body class="d-flex">
-        <jsp:useBean id="browseCoursesPage" class="com.turygin.states.BrowseCoursesPageState" />
         <c:import url="/templates/header.jsp"/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
