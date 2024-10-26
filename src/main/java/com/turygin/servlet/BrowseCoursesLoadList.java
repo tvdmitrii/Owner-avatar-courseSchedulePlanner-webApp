@@ -7,9 +7,9 @@ import com.turygin.states.BrowseCoursesPageState;
 
 import java.io.*;
 import java.util.List;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
 
 
 /**
