@@ -9,6 +9,11 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import com.auth0.jwk.*;
+
 /**
  *  Application startup servlet that initializes REST Client.
  */
@@ -31,9 +36,21 @@ public class WebAppStartup extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         ServletContext context = getServletContext();
-        String apiBaseUrl = Config.getProperties().getProperty("rest.client.baseUrl");
-        context.setAttribute("restClient", new RestClient(apiBaseUrl));
-        LOG.info("Initialized REST API client with base URL {}.", apiBaseUrl);
+
+        Properties webAppProps = Config.getProperties();
+        String apiBaseUrl = webAppProps.getProperty("rest.client.baseUrl");
+
+        RestClient restClient = new RestClient(apiBaseUrl);
+        context.setAttribute("restClient", restClient);
+        LOG.debug("Initialized REST API client with base URL {}.", apiBaseUrl);
+
+        String issuerUrl = Config.getCognitoIssuerUrl();
+        JwkProvider cognitoJwkProvider = new JwkProviderBuilder(issuerUrl)
+                .cached(10, 24, TimeUnit.HOURS) // Cache up to 10 keys for 24 hours
+                .rateLimited(10, 1, TimeUnit.MINUTES) // Rate limit requests to 10 per minute
+                .build();
+        context.setAttribute("cognitoJwkProvider", cognitoJwkProvider);
+        LOG.debug("Initialized Cognito JWK Provider from URL {}.", issuerUrl);
     }
 
 }

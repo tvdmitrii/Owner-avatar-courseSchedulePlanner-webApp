@@ -8,15 +8,15 @@ import java.util.List;
 
 public class BrowseCoursesPageState {
 
-    List<CourseBasicDTO> loadedCourses = new ArrayList<>();
+    private List<CourseBasicDTO> loadedCourses = new ArrayList<>();
 
-    List<DepartmentBasicDTO> loadedDepartments = new ArrayList<>();
+    private List<DepartmentBasicDTO> loadedDepartments = new ArrayList<>();
 
-    DepartmentBasicDTO selectedDepartment;
+    private DepartmentBasicDTO selectedDepartment;
 
-    CourseBasicDTO selectedCourse;
+    private CourseBasicDTO selectedCourse;
 
-    String titleSearchTerm;
+    private String titleSearchTerm;
 
     public boolean getHasLoadedCourses() {
         return loadedCourses != null && !loadedCourses.isEmpty();

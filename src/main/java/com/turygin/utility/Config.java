@@ -38,4 +38,12 @@ public class Config {
 
         return properties;
     }
+
+    public static String getCognitoIssuerUrl() {
+        Properties props = getProperties();
+        return String.format(
+                props.getProperty("cognito.issuer.url.template"),
+                props.getProperty("cognito.region"),
+                props.getProperty("cognito.pool.id"));
+    }
 }
