@@ -1,5 +1,7 @@
 package com.turygin.api.client;
 
+import com.turygin.api.model.UserDTO;
+import com.turygin.api.resource.IUserResource;
 import com.turygin.utility.Config;
 import com.turygin.cognito.TokenResponse;
 import jakarta.ws.rs.client.Client;
@@ -24,7 +26,7 @@ import java.util.Properties;
 /**
  * REST API client that implements ICourseRepository interface.
  */
-public class RestClient implements ICourseResource, IDepartmentResource {
+public class RestClient implements ICourseResource, IDepartmentResource, IUserResource {
 
     private final String baseUrl;
     private final Client client;
@@ -50,6 +52,14 @@ public class RestClient implements ICourseResource, IDepartmentResource {
      */
     private String getDepartmentUrl() {
         return String.format("%s/%s", baseUrl, "department");
+    }
+
+    /**
+     * Helper method that constructs URL for user endpoints.
+     * @return URL for user endpoints
+     */
+    private String getUserUrl() {
+        return String.format("%s/%s", baseUrl, "user");
     }
 
     public TokenResponse getCognitoToken(String authorizationCode)
@@ -130,5 +140,27 @@ public class RestClient implements ICourseResource, IDepartmentResource {
     public List<DepartmentBasicDTO> getAllDepartments() {
         return client.target(getDepartmentUrl()).request(MediaType.APPLICATION_JSON).
                 get(new GenericType<List<DepartmentBasicDTO>>() {});
+    }
+
+
+    /**
+     * Create user if does not exist and get their information.
+     * @param uuid UUID from Cognito
+     * @return user information object
+     */
+    public UserDTO createUserIfNotExists(String uuid) {
+
+        Form form = new Form();
+        form.param("uuid", uuid);
+
+        Response response =  client.target(getUserUrl()).
+                request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+                accept(MediaType.APPLICATION_JSON_TYPE).
+                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+
+        LOG.debug("Response status {} {}.", response.getStatus(),
+                response.getStatusInfo().getReasonPhrase());
+
+        return response.readEntity(UserDTO.class);
     }
 }
