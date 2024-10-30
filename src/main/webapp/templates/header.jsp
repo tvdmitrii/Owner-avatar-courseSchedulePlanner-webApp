@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <header class="d-flex flex-wrap justify-content-center border-bottom">
     <div id="header-title" class="d-flex mt-1">
         <span class="fs-3">Course Schedule Planner. Under Construction.</span>
@@ -10,24 +11,36 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Browse</a>
+                        <a class="nav-link ${navState.currentPage == 'browseCourses' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/browseCoursesLoadList">Browse</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">My Courses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">My Schedules</a>
-                    </li>
+                    <c:if test="${userState != null}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">My Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">My Schedules</a>
+                        </li>
+                    </c:if>
                 </ul>
                 <span class="flex-grow-1"></span>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sign In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Sign Up</a>
-                    </li>
-                </ul>
+                <c:choose>
+                    <c:when test="${userState == null}">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/logIn">Log In</a>
+                            </li>
+                        </ul>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="d-flex">Welcome, ${userState.firstName}!</div>
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/logOut">Log Out</a>
+                            </li>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </nav>

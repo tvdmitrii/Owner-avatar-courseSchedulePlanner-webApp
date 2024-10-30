@@ -7,6 +7,8 @@ import com.turygin.states.BrowseCoursesPageState;
 
 import java.io.*;
 import java.util.List;
+
+import com.turygin.states.NavigationState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -37,6 +39,12 @@ public class BrowseCoursesLoadList extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = new NavigationState("browseCourses");
+        session.setAttribute("navState", navState);
+
         // Initialize page state
         BrowseCoursesPageState pageState = new BrowseCoursesPageState();
 
@@ -53,7 +61,6 @@ public class BrowseCoursesLoadList extends HttpServlet {
         pageState.setLoadedCourses(courses);
 
         // Save page state in session
-        HttpSession session = request.getSession();
         session.setAttribute("browseCoursesPage", pageState);
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);

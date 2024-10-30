@@ -3,6 +3,7 @@ package com.turygin.servlet;
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.states.BrowseCoursesPageState;
+import com.turygin.states.NavigationState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,8 +45,13 @@ public class BrowseCoursesSearch extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get page state
         HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = new NavigationState("browseCourses");
+        session.setAttribute("navState", navState);
+
+        // Get page state
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
         if (pageState == null) {

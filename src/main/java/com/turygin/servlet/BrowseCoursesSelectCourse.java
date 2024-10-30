@@ -4,6 +4,7 @@ import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.states.BrowseCoursesPageState;
 
+import com.turygin.states.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,8 +42,13 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get page state
         HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = new NavigationState("browseCourses");
+        session.setAttribute("navState", navState);
+
+        // Get page state
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
         if (pageState == null) {
