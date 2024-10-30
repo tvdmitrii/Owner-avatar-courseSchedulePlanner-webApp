@@ -1,12 +1,15 @@
 package com.turygin.states;
 
+import java.util.UUID;
+
 /**
  * Stores information about a user during their session.
  */
 public class UserState {
     /** Unique database user id. */
     private long userId;
-
+    private UUID cognitoUuid;
+    private String userName;
     private String firstName;
     private String lastName;
     private boolean isAdmin;
@@ -54,5 +57,21 @@ public class UserState {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public UUID getCognitoUuid() {
+        return cognitoUuid;
+    }
+
+    public void setCognitoUuid(UUID cognitoUuid) {
+        this.cognitoUuid = cognitoUuid;
     }
 }
