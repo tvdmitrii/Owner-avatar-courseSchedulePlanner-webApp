@@ -17,6 +17,7 @@
         <c:set var="selectedCourse" scope="request" value="${browseCoursesPage.selectedCourse}"/>
         <c:set var="hasLoadedCourses" scope="request" value="${browseCoursesPage.hasLoadedCourses}"/>
         <c:set var="loadedCourses" scope="request" value="${browseCoursesPage.loadedCourses}"/>
+        <c:set var="detailsServlet" scope="request" value="browseCoursesSelectCourse"/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
                 <c:import url="/templates/courseSearch.jsp"/>
