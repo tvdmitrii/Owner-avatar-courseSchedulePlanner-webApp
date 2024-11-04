@@ -16,7 +16,8 @@
                     </li>
                     <c:if test="${userState != null}">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">My Courses</a>
+                            <a class="nav-link ${navState.currentPage == 'viewCart' ? "active" : ""}"
+                               href="${pageContext.request.contextPath}/viewCart">My Courses</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">My Schedules</a>

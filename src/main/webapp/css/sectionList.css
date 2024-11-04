@@ -1,0 +1,16 @@
+#section-list-card-body {
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: stretch;
+    gap: 2rem;
+    flex: 1 1 1px;
+}
+
+#section-list ul {
+    flex: 1 1 1px;
+}
+
+#section-list {
+    display: flex;
+    flex: 1 1 1px;
+}

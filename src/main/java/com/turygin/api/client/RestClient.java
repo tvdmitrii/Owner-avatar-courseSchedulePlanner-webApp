@@ -1,6 +1,8 @@
 package com.turygin.api.client;
 
+import com.turygin.api.model.CourseWithSectionsDTO;
 import com.turygin.api.model.UserDTO;
+import com.turygin.api.resource.ICartResourse;
 import com.turygin.api.resource.IUserResource;
 import com.turygin.utility.Config;
 import com.turygin.cognito.TokenResponse;
@@ -26,7 +28,7 @@ import java.util.Properties;
 /**
  * REST API client that implements ICourseRepository interface.
  */
-public class RestClient implements ICourseResource, IDepartmentResource, IUserResource {
+public class RestClient implements ICourseResource, IDepartmentResource, IUserResource, ICartResourse {
 
     private final String baseUrl;
     private final Client client;
@@ -52,6 +54,14 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
      */
     private String getDepartmentUrl() {
         return String.format("%s/%s", baseUrl, "department");
+    }
+
+    /**
+     * Helper method that constructs URL for cart endpoints.
+     * @return URL for cart endpoints
+     */
+    private String getCartUrl() {
+        return String.format("%s/%s", baseUrl, "cart");
     }
 
     /**
@@ -162,5 +172,25 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
                 response.getStatusInfo().getReasonPhrase());
 
         return response.readEntity(UserDTO.class);
+    }
+
+    public List<CourseWithSectionsDTO> cartGetCourses(long userId) {
+        return client.target(getCartUrl()).path(String.valueOf(userId)).request(MediaType.APPLICATION_JSON).
+                get(new GenericType<List<CourseWithSectionsDTO>>() {});
+    }
+
+    @Override
+    public void cartAddCourseToCart(long l, long l1) {
+
+    }
+
+    @Override
+    public void cartRemoveCourse(long l, long l1) {
+
+    }
+
+    @Override
+    public void cartUpdateCourse(long l, long l1, List<Long> list) {
+
     }
 }
