@@ -7,11 +7,16 @@
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <link rel="stylesheet" href="css/fontawesome.css"/>
         <link rel="stylesheet" href="css/main.css"/>
+        <link rel="stylesheet" href="css/browseCourses.css"/>
         <script src="js/bootstrap.bundle.min.js"></script>
         <title>Course Schedule Planner</title>
     </head>
     <body class="d-flex">
         <c:import url="/templates/header.jsp"/>
+        <c:set var="hasSelectedCourse" scope="request" value="${browseCoursesPage.hasSelectedCourse}"/>
+        <c:set var="selectedCourse" scope="request" value="${browseCoursesPage.selectedCourse}"/>
+        <c:set var="hasLoadedCourses" scope="request" value="${browseCoursesPage.hasLoadedCourses}"/>
+        <c:set var="loadedCourses" scope="request" value="${browseCoursesPage.loadedCourses}"/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
                 <c:import url="/templates/courseSearch.jsp"/>

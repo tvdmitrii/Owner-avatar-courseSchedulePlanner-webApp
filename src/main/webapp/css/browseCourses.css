@@ -1,0 +1,13 @@
+@import url("courseList.css");
+
+#course-search-section {
+    flex: 1 1 0;
+}
+
+#course-list-section {
+    flex: 1 1 0;
+}
+
+#course-description-section {
+    flex: 3 1 0;
+}

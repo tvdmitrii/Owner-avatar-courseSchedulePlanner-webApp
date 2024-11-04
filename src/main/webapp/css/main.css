@@ -32,36 +32,3 @@ main {
     flex: 14 1 0;
     gap: 1rem;
 }
-
-#course-search-section {
-    flex: 1 1 0;
-}
-
-#course-list-section {
-    flex: 1 1 0;
-}
-
-#course-description-section {
-    flex: 3 1 0;
-}
-
-#course-list-card-body {
-    display: flex;
-    flex-flow: column nowrap;
-    align-content: stretch;
-    gap: 2rem;
-    flex: 1 1 1px;
-}
-
-#course-list ul {
-    flex: 1 1 1px;
-}
-
-#course-list {
-    display: flex;
-    flex: 1 1 1px;
-}
-
-#course-list-pagination {
-    margin: auto;
-}
