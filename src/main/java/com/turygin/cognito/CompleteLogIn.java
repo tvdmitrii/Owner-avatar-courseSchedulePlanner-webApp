@@ -15,6 +15,7 @@ import com.turygin.api.model.UserDTO;
 import com.turygin.states.UserState;
 import com.turygin.utility.Config;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,7 +46,9 @@ public class CompleteLogIn extends HttpServlet {
         ServletContext context = getServletContext();
         RestClient client = (RestClient) context.getAttribute("restClient");
         JwkProvider cognitoJwkProvider = (JwkProvider) context.getAttribute("cognitoJwkProvider");
-        UserState userState = (UserState) context.getAttribute("userState");
+
+        HttpSession session = request.getSession();
+        UserState userState = (UserState) session.getAttribute("userState");
 
         String authorizationCode = request.getParameter("code");
 
@@ -64,7 +67,7 @@ public class CompleteLogIn extends HttpServlet {
             assert userState != null;
 
             populateUserFromDatabase(userState, client);
-            context.setAttribute("userState", userState);
+            session.setAttribute("userState", userState);
             LOG.debug("Successfully authenticated user with UUID '{}' and ID '{}'.",
                     userState.getCognitoUuid().toString(), userState.getUserId());
         } catch (AssertionError assertionError) {
