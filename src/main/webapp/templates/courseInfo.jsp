@@ -9,6 +9,11 @@
       <p class="card-text">${selectedCourse.description}</p>
       <h6 class="card-title mt-2">Credits:</h6>
       <p class="card-text">${selectedCourse.credits}</p>
+      <c:if test="${userState != null}">
+        <form action="${pageContext.request.contextPath}/browseCoursesAddToCart" method="POST">
+          <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+      </c:if>
     </div>
   </c:when>
   <c:otherwise>
