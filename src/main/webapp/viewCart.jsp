@@ -19,6 +19,8 @@
         <c:set var="loadedCourses" scope="request" value="${viewCartPage.loadedCourses}"/>
         <c:set var="detailsServlet" scope="request" value="viewCartSelectCourse"/>
         <c:set var="hasSections" scope="request" value="${viewCartPage.hasSections}"/>
+        <c:set var="courseListTitle" scope="request" value="Cart"/>
+        <c:set var="courseListEmptyText" scope="request" value="No Courses."/>
         <main class="d-flex">
             <div id="course-list-section" class="card d-flex my-3 p-3">
                 <c:import url="/templates/courseList.jsp"/>

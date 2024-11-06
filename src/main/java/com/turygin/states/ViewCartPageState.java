@@ -61,4 +61,12 @@ public class ViewCartPageState {
     public int getSelectedCourseId() {
         return selectedCourseId;
     }
+
+    public void removeSelectedCourse() {
+        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
+            return;
+        }
+        this.loadedCourses.remove(selectedCourseId);
+        selectedCourseId = -1;
+    }
 }

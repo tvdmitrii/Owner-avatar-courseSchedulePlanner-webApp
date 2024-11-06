@@ -18,6 +18,8 @@
         <c:set var="hasLoadedCourses" scope="request" value="${browseCoursesPage.hasLoadedCourses}"/>
         <c:set var="loadedCourses" scope="request" value="${browseCoursesPage.loadedCourses}"/>
         <c:set var="detailsServlet" scope="request" value="browseCoursesSelectCourse"/>
+        <c:set var="courseListTitle" scope="request" value="Results"/>
+        <c:set var="courseListEmptyText" scope="request" value="No Results."/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
                 <c:import url="/templates/courseSearch.jsp"/>

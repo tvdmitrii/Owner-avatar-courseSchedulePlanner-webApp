@@ -1,9 +1,9 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<h5 class="card-header">Results</h5>
+<h5 class="card-header">Course Sections</h5>
 <c:choose>
     <c:when test="${hasSelectedCourse && hasSections}">
-        <form action="${pageContext.request.contextPath}/viewCartSaveCourse" method="POST">
-            <div id="section-list-card-body" class="card-body">
+        <div id="section-list-card-body" class="card-body">
+            <form action="${pageContext.request.contextPath}/viewCartModifyCourse" method="POST">
                 <div id="section-table" class="overflow-auto">
                     <table class="table table-striped">
                         <thead>
@@ -33,13 +33,21 @@
                         </tbody>
                     </table>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
+                <button type="submit" name="action" value="save" class="btn btn-primary">Save</button>
+                <button type="submit" name="action" value="delete" class="btn btn-danger">Remove</button>
+            </form>
+        </div>
     </c:when>
     <c:when test="${hasSelectedCourse}">
-        <div class="card-body d-flex justify-content-center">
-            <h4 class="card-title mt-1 d-flex align-self-center">There Are No Sections.</h4>
+        <div class="card-body d-flex flex-column ">
+            <div class="d-flex flex-grow-1 justify-content-center">
+                <h4 class="card-title mt-1 d-flex align-self-center">There Are No Sections.</h4>
+            </div>
+            <div class="d-flex">
+                <form action="${pageContext.request.contextPath}/viewCartModifyCourse" method="POST">
+                    <button type="submit" name="action" value="delete" class="btn btn-danger">Remove</button>
+                </form>
+            </div>
         </div>
     </c:when>
     <c:otherwise>

@@ -181,16 +181,16 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
                 get(new GenericType<List<CourseWithSectionsDTO>>() {});
     }
 
-    @Override
     public void cartAddCourseToCart(long userId, long courseId) {
         client.target(getCartUrl() + "/{userId}/course/{courseId}").
                 resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).request().
                 post(Entity.json(""));
     }
 
-    @Override
     public void cartRemoveCourse(long userId, long courseId) {
-
+        client.target(getCartUrl() + "/{userId}/course/{courseId}").
+                resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).request().
+                delete();
     }
 
     public CourseWithSectionsDTO cartUpdateCourse(long userId, long courseId, List<Long> sectionIds) {
