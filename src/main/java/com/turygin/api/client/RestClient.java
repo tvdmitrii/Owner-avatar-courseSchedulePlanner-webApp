@@ -87,17 +87,18 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
                 ":" + webAppProps.getProperty("cognito.client.secret");
         String authHeaderEncoded = Base64.getEncoder().encodeToString(authHeader.getBytes());
 
-        Response response = client.target(Config.getProperties().
-                getProperty("cognito.oauthURL")).
+        try (Response response = client.target(Config.getProperties().
+                        getProperty("cognito.oauthURL")).
                 request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
                 header("Authorization", "Basic " + authHeaderEncoded).
                 accept(MediaType.APPLICATION_JSON).
-                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE))) {
 
-        LOG.debug("Response status {} {}.", response.getStatus(),
-                response.getStatusInfo().getReasonPhrase());
+            LOG.debug("Response status {} {}.", response.getStatus(),
+                    response.getStatusInfo().getReasonPhrase());
 
-        return response.readEntity(TokenResponse.class);
+            return response.readEntity(TokenResponse.class);
+        }
     }
 
     /**
@@ -163,15 +164,16 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
         Form form = new Form();
         form.param("uuid", uuid);
 
-        Response response =  client.target(getUserUrl()).
+        try (Response response = client.target(getUserUrl()).
                 request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
                 accept(MediaType.APPLICATION_JSON_TYPE).
-                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE))) {
 
-        LOG.debug("Response status {} {}.", response.getStatus(),
-                response.getStatusInfo().getReasonPhrase());
+            LOG.debug("Response status {} {}.", response.getStatus(),
+                    response.getStatusInfo().getReasonPhrase());
 
-        return response.readEntity(UserDTO.class);
+            return response.readEntity(UserDTO.class);
+        }
     }
 
     public List<CourseWithSectionsDTO> cartGetCourses(long userId) {
@@ -189,8 +191,11 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
 
     }
 
-    @Override
-    public void cartUpdateCourse(long l, long l1, List<Long> list) {
-
+    public CourseWithSectionsDTO cartUpdateCourse(long userId, long courseId, List<Long> sectionIds) {
+        try (Response response = client.target(getCartUrl() + "/{userId}/course/{courseId}").
+                resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).
+                request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionIds, MediaType.APPLICATION_JSON))) {
+            return response.readEntity(CourseWithSectionsDTO.class);
+        }
     }
 }

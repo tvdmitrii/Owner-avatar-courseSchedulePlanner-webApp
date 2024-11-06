@@ -5,27 +5,31 @@ import com.turygin.api.model.SectionDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 
 public class ViewCartPageState {
     private List<CourseWithSectionsDTO> loadedCourses = new ArrayList<>();
 
-    private CourseWithSectionsDTO selectedCourse;
+    private int selectedCourseId = -1;
 
     public boolean getHasLoadedCourses() {
         return loadedCourses != null && !loadedCourses.isEmpty();
     }
 
     public boolean getHasSelectedCourse() {
-        return selectedCourse != null;
+        return selectedCourseId != -1;
     }
 
     public boolean getHasSections() {
         return getHasSelectedCourse() &&
-                selectedCourse.getSections() != null && !selectedCourse.getSections().isEmpty();
+                getSelectedCourse().getSections() != null && !getSelectedCourse().getSections().isEmpty();
     }
 
-    public List<SectionDTO> getSections() {
-        return selectedCourse.getSections();
+    public SortedMap<Long,SectionDTO> getSections() {
+        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
+            return null;
+        }
+        return getSelectedCourse().getSections();
     }
 
     public List<CourseWithSectionsDTO> getLoadedCourses() {
@@ -37,10 +41,24 @@ public class ViewCartPageState {
     }
 
     public CourseWithSectionsDTO getSelectedCourse() {
-        return selectedCourse;
+        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
+            return null;
+        }
+        return this.loadedCourses.get(selectedCourseId);
     }
 
-    public void setSelectedCourse(CourseWithSectionsDTO selectedCourse) {
-        this.selectedCourse = selectedCourse;
+    public void updateSelectedCourse(CourseWithSectionsDTO newCourse) {
+        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
+            return;
+        }
+        this.loadedCourses.set(selectedCourseId, newCourse);
+    }
+
+    public void setSelectedCourseId(int selectedCourseId) {
+        this.selectedCourseId = selectedCourseId;
+    }
+
+    public int getSelectedCourseId() {
+        return selectedCourseId;
     }
 }

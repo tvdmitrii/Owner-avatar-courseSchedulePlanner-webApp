@@ -1,6 +1,7 @@
 package com.turygin.servlet;
 
 import com.turygin.states.NavigationState;
+import com.turygin.states.UserState;
 import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -37,6 +38,14 @@ public class ViewCartSelectCourse extends HttpServlet {
 
         HttpSession session = request.getSession();
 
+        // Check that logged in.
+        UserState user = (UserState) session.getAttribute("userState");
+        if (user == null) {
+            // Not logged in.
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            return;
+        }
+
         // Set navigation state
         NavigationState navState = new NavigationState("viewCart");
         session.setAttribute("navState", navState);
@@ -44,8 +53,8 @@ public class ViewCartSelectCourse extends HttpServlet {
         // Get page state
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
+        // Check that cart course list was initialized.
         if (pageState == null) {
-            // Should not be here yet. Cart course list was not initialized.
             response.sendRedirect(String.format("%s/%s", request.getContextPath(), "viewCart"));
             return;
         }
@@ -53,10 +62,10 @@ public class ViewCartSelectCourse extends HttpServlet {
         try {
             // Select a course from the list if the index is valid ...
             int courseListId = Integer.parseInt(request.getParameter("courseListId"));
-            pageState.setSelectedCourse(pageState.getLoadedCourses().get(courseListId));
+            pageState.setSelectedCourseId(courseListId);
         } catch (Exception e) {
             // ... or remove selection
-            pageState.setSelectedCourse(null);
+            pageState.setSelectedCourseId(-1);
         }
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);

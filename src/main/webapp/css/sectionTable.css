@@ -6,11 +6,6 @@
     flex: 1 1 1px;
 }
 
-#section-list ul {
-    flex: 1 1 1px;
-}
-
-#section-list {
+#section-table {
     display: flex;
-    flex: 1 1 1px;
 }

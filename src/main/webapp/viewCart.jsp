@@ -23,8 +23,8 @@
             <div id="course-list-section" class="card d-flex my-3 p-3">
                 <c:import url="/templates/courseList.jsp"/>
             </div>
-            <div id="section-list-section" class="card d-flex my-3 me-3 p-3">
-                <c:import url="/templates/sectionList.jsp"/>
+            <div id="section-table-section" class="card d-flex my-3 me-3 p-3">
+                <c:import url="/templates/sectionTable.jsp"/>
             </div>
         </main>
         <c:import url="/templates/footer.jsp"/>
