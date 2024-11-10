@@ -45,11 +45,11 @@ public class EditCourse extends HttpServlet {
 
         // Update course selection on the server
         CourseWithSectionsDTO updatedCourse = client.
-                cartUpdateCourse(user.getUserId(), pageState.getSelectedCourse().getId(), sectionIds);
+                cartUpdateCourse(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds);
 
         // Update course selection on the client
         if (updatedCourse != null) {
-            pageState.updateSelectedCourse(updatedCourse);
+            pageState.getCourses().updateSelected(updatedCourse);
             LOG.debug("Course updated: {}", updatedCourse);
         } else {
             LOG.debug("REST API could not update the course.");
@@ -69,7 +69,7 @@ public class EditCourse extends HttpServlet {
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
         // Check that view cart page was initialized and a course is selected
-        if (!pageState.getHasSelectedCourse()) {
+        if (!pageState.getCourses().getHasSelected()) {
             LOG.warn("Cart courses not loaded.");
             response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
@@ -89,8 +89,8 @@ public class EditCourse extends HttpServlet {
                 updateCourse(request, user, pageState, client);
             } else if (action.equals("delete")) {
                 LOG.debug("Removing course.");
-                client.cartRemoveCourse(user.getUserId(), pageState.getSelectedCourse().getId());
-                pageState.removeSelectedCourse();
+                client.cartRemoveCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
+                pageState.getCourses().removeSelected();
             } else {
                 LOG.warn("Unknown action: {}.", action);
             }

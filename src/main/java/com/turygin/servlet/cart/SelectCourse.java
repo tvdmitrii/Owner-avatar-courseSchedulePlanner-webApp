@@ -46,10 +46,10 @@ public class SelectCourse extends HttpServlet {
         try {
             // Select a course from the list if the index is valid ...
             int courseListId = Integer.parseInt(request.getParameter("courseListId"));
-            pageState.setSelectedCourseId(courseListId);
+            pageState.getCourses().setSelectedId(courseListId);
         } catch (Exception e) {
             // ... or remove selection
-            pageState.setSelectedCourseId(-1);
+            pageState.getCourses().resetSelected();
         }
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());

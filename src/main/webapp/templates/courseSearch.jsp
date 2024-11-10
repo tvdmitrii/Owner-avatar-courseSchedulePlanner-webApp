@@ -5,11 +5,11 @@
     <div class="mb-3">
       <label for="department-input" class="form-label">Department</label>
       <select class="form-select" id="department-input" name="departmentListId">
-        <option ${!browseCoursesPage.hasSelectedDepartment ? "selected" : ""}>Select Department</option>
-        <c:forEach var="department" items="${browseCoursesPage.loadedDepartments}" varStatus="loop">
+        <option ${!browseCoursesPage.departments.hasSelected ? "selected" : ""}>Select Department</option>
+        <c:forEach var="department" items="${browseCoursesPage.departments.items}" varStatus="loop">
           <option
-            ${browseCoursesPage.hasSelectedDepartment
-                    && department.id == browseCoursesPage.selectedDepartment.id ? "selected" : ""}
+            ${browseCoursesPage.departments.hasSelected
+                    && department.id == browseCoursesPage.departments.selected.id ? "selected" : ""}
                   value="${loop.index}">${department.name}</option>
         </c:forEach>
       </select>

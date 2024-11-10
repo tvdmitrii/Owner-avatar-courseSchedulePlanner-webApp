@@ -65,11 +65,11 @@ public class SearchCourses extends HttpServlet {
         // Set search department (if present)
         try {
             int departmentListId = Integer.parseInt(request.getParameter("departmentListId"));
-            pageState.setSelectedDepartment(pageState.getLoadedDepartments().get(departmentListId));
-            LOG.debug("Found search department with ID '{}'.", pageState.getSelectedDepartmentId());
+            pageState.getDepartments().setSelectedId(departmentListId);
+            LOG.debug("Found search department with ID '{}'.", departmentListId);
         } catch (Exception e) {
-            LOG.debug("Department search missing. Set to null.");
-            pageState.setSelectedDepartment(null);
+            LOG.debug("Department search missing. Reset selection.");
+            pageState.getDepartments().resetSelected();
         }
 
         // Fetch REST API client from the context
@@ -78,12 +78,12 @@ public class SearchCourses extends HttpServlet {
 
         // Search for courses using API
         List<CourseBasicDTO> courses = client.findCourses(pageState.getTitleSearchTerm(),
-                pageState.getSelectedDepartmentId());
-        pageState.setLoadedCourses(courses);
+                pageState.getDepartments().getSelected().getId());
+        pageState.setCourses(courses);
         LOG.debug("Found {} courses.", courses.size());
 
         // Reset selected course
-        pageState.setSelectedCourse(null);
+        pageState.getCourses().resetSelected();
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);

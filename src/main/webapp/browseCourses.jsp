@@ -25,6 +25,7 @@
                 <c:import url="/templates/courseList.jsp"/>
             </div>
             <div id="course-description-section" class="card d-flex my-3 me-3 p-3">
+                <%--<c:import url="/templates/admin/courseEdit.jsp"/>--%>
                 <c:import url="/templates/courseInfo.jsp"/>
             </div>
         </main>

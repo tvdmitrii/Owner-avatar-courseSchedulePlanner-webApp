@@ -55,7 +55,7 @@ public class AddToCart extends HttpServlet {
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
         // Make sure course is selected
-        if (!pageState.getHasSelectedCourse()) {
+        if (!pageState.getCourses().getHasSelected()) {
             response.sendRedirect(String.format("%s/%s", request.getContextPath(),
                     NavigationState.CART.getDefaultServlet()));
             return;
@@ -65,10 +65,10 @@ public class AddToCart extends HttpServlet {
             // Add course to cart ...
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
-            client.cartAddCourseToCart(user.getUserId(), pageState.getSelectedCourse().getId());
+            client.cartAddCourseToCart(user.getUserId(), pageState.getCourses().getSelected().getId());
         } catch (Exception e) {
             // ... or remove selection
-            pageState.setSelectedCourse(null);
+            pageState.getCourses().resetSelected();
         }
 
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());

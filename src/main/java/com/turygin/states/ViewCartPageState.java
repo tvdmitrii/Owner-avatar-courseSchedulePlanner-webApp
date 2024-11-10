@@ -3,70 +3,32 @@ package com.turygin.states;
 import com.turygin.api.model.CourseWithSectionsDTO;
 import com.turygin.api.model.SectionDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
 public class ViewCartPageState {
-    private List<CourseWithSectionsDTO> loadedCourses = new ArrayList<>();
 
-    private int selectedCourseId = -1;
-
-    public boolean getHasLoadedCourses() {
-        return loadedCourses != null && !loadedCourses.isEmpty();
-    }
-
-    public boolean getHasSelectedCourse() {
-        return selectedCourseId != -1;
-    }
+    private LoadedList<CourseWithSectionsDTO> courses = new LoadedList<>();
 
     public boolean getHasSections() {
-        return getHasSelectedCourse() &&
-                getSelectedCourse().getSections() != null && !getSelectedCourse().getSections().isEmpty();
+        return courses.getHasItems() &&
+                courses.getHasSelected() &&
+                courses.getSelected().getSections() != null &&
+                !courses.getSelected().getSections().isEmpty();
     }
 
     public SortedMap<Long,SectionDTO> getSections() {
-        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
+        if (!getHasSections()) {
             return null;
         }
-        return getSelectedCourse().getSections();
+        return courses.getSelected().getSections();
     }
 
-    public List<CourseWithSectionsDTO> getLoadedCourses() {
-        return loadedCourses;
+    public LoadedList<CourseWithSectionsDTO> getCourses() {
+        return courses;
     }
 
-    public void setLoadedCourses(List<CourseWithSectionsDTO> loadedCourses) {
-        this.loadedCourses = loadedCourses;
-    }
-
-    public CourseWithSectionsDTO getSelectedCourse() {
-        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
-            return null;
-        }
-        return this.loadedCourses.get(selectedCourseId);
-    }
-
-    public void updateSelectedCourse(CourseWithSectionsDTO newCourse) {
-        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
-            return;
-        }
-        this.loadedCourses.set(selectedCourseId, newCourse);
-    }
-
-    public void setSelectedCourseId(int selectedCourseId) {
-        this.selectedCourseId = selectedCourseId;
-    }
-
-    public int getSelectedCourseId() {
-        return selectedCourseId;
-    }
-
-    public void removeSelectedCourse() {
-        if (!getHasLoadedCourses() || !getHasSelectedCourse()) {
-            return;
-        }
-        this.loadedCourses.remove(selectedCourseId);
-        selectedCourseId = -1;
+    public void setCourses(List<CourseWithSectionsDTO> courses) {
+        this.courses.setItems(courses);
     }
 }

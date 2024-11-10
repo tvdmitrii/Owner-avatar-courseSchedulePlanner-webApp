@@ -52,11 +52,11 @@ public class LoadCourses extends HttpServlet {
 
         // Fetch department info from the API
         List<DepartmentBasicDTO> departments = client.getAllDepartments();
-        pageState.setLoadedDepartments(departments);
+        pageState.setDepartments(departments);
 
         // Fetch course info from the API
         List<CourseBasicDTO> courses = client.getAllCourses();
-        pageState.setLoadedCourses(courses);
+        pageState.setCourses(courses);
 
         // Save page state in session
         session.setAttribute("browseCoursesPage", pageState);

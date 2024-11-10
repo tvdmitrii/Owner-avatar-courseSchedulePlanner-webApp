@@ -53,7 +53,7 @@ public class ViewCart extends HttpServlet {
 
         // Fetch cart course info from API
         List<CourseWithSectionsDTO> courses = client.cartGetCourses(user.getUserId());
-        pageState.setLoadedCourses(courses);
+        pageState.setCourses(courses);
 
         // Save page state in session
         session.setAttribute("viewCartPage", pageState);
