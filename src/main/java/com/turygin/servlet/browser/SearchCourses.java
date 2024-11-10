@@ -52,13 +52,6 @@ public class SearchCourses extends HttpServlet {
         // Get page state
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
-        if (pageState == null) {
-            // Should not be here yet. Course list was not initialized.
-            LOG.debug("Page state is null. Leaving search...");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
-            return;
-        }
-
         // Set search title (if present)
         try {
             String searchTitle = request.getParameter("title");

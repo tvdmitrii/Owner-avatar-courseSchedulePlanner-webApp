@@ -65,21 +65,12 @@ public class EditCourse extends HttpServlet {
         NavigationState navState = NavigationState.CART;
         session.setAttribute("navState", navState);
 
-        // Check that logged in.
-        UserState user = (UserState) session.getAttribute("userState");
-        if (user == null) {
-            // Not logged in.
-            LOG.warn("Unauthenticated user access.");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
-            return;
-        }
-
         // Get page state
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
         // Check that view cart page was initialized and a course is selected
-        if (pageState == null || !pageState.getHasSelectedCourse()) {
-            LOG.warn("No course selected or cart courses not loaded.");
+        if (!pageState.getHasSelectedCourse()) {
+            LOG.warn("Cart courses not loaded.");
             response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
@@ -91,6 +82,7 @@ public class EditCourse extends HttpServlet {
             // Fetch REST API client from the context
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
+            UserState user = (UserState) session.getAttribute("userState");
 
             if (action.equals("save")) {
                 LOG.debug("Updating course.");

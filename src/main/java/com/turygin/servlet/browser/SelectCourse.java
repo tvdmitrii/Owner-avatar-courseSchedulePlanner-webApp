@@ -45,12 +45,6 @@ public class SelectCourse extends HttpServlet {
         // Get page state
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
-        if (pageState == null) {
-            // Should not be here yet. Course list was not initialized.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
-            return;
-        }
-
         try {
             // Select a course from the list if the index is valid ...
             int courseListId = Integer.parseInt(request.getParameter("courseListId"));

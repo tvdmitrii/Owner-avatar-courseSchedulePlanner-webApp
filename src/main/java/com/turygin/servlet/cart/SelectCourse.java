@@ -40,22 +40,8 @@ public class SelectCourse extends HttpServlet {
         NavigationState navState = NavigationState.CART;
         session.setAttribute("navState", navState);
 
-        // Check that logged in.
-        UserState user = (UserState) session.getAttribute("userState");
-        if (user == null) {
-            // Not logged in.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
-            return;
-        }
-
         // Get page state
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
-
-        // Check that cart course list was initialized.
-        if (pageState == null) {
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
-            return;
-        }
 
         try {
             // Select a course from the list if the index is valid ...

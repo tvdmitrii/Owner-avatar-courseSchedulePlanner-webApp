@@ -55,8 +55,9 @@ public class AddToCart extends HttpServlet {
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
         // Make sure course is selected
-        if (pageState == null || !pageState.getHasSelectedCourse()) {
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
+        if (!pageState.getHasSelectedCourse()) {
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(),
+                    NavigationState.CART.getDefaultServlet()));
             return;
         }
 

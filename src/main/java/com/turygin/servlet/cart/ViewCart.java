@@ -38,17 +38,11 @@ public class ViewCart extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        UserState user = (UserState) session.getAttribute("userState");
 
         // Set navigation state
         NavigationState navState = NavigationState.CART;
         session.setAttribute("navState", navState);
-
-        UserState user = (UserState) session.getAttribute("userState");
-        if (user == null) {
-            // Not logged in.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
-            return;
-        }
 
         // Initialize page state
         ViewCartPageState pageState = new ViewCartPageState();
