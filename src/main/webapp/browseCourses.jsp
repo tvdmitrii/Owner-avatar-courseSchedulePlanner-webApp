@@ -13,10 +13,7 @@
     </head>
     <body class="d-flex">
         <c:import url="/templates/header.jsp"/>
-        <c:set var="hasSelectedCourse" scope="request" value="${browseCoursesPage.hasSelectedCourse}"/>
-        <c:set var="selectedCourse" scope="request" value="${browseCoursesPage.selectedCourse}"/>
-        <c:set var="hasLoadedCourses" scope="request" value="${browseCoursesPage.hasLoadedCourses}"/>
-        <c:set var="loadedCourses" scope="request" value="${browseCoursesPage.loadedCourses}"/>
+        <c:set var="page" scope="request" value="${browseCoursesPage}"/>
         <c:set var="detailsServlet" scope="request" value="browser/select"/>
         <c:set var="courseListTitle" scope="request" value="Results"/>
         <c:set var="courseListEmptyText" scope="request" value="No Results."/>

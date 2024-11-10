@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <h5 class="card-header">Course Sections</h5>
 <c:choose>
-    <c:when test="${hasSelectedCourse && hasSections}">
+    <c:when test="${viewCartPage.hasSelectedCourse && viewCartPage.hasSections}">
         <div id="section-list-card-body" class="card-body">
             <form action="${pageContext.request.contextPath}/cart/edit" method="POST">
                 <div id="section-table" class="overflow-auto">
@@ -16,7 +16,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach var="entry" items="${selectedCourse.sections}" varStatus="loop">
+                        <c:forEach var="entry" items="${viewCartPage.selectedCourse.sections}" varStatus="loop">
                             <tr>
                                 <th scope="row">Section ${loop.index+1}</th>
                                 <td>
@@ -38,7 +38,7 @@
             </form>
         </div>
     </c:when>
-    <c:when test="${hasSelectedCourse}">
+    <c:when test="${viewCartPage.hasSelectedCourse}">
         <div class="card-body d-flex flex-column ">
             <div class="d-flex flex-grow-1 justify-content-center">
                 <h4 class="card-title mt-1 d-flex align-self-center">There Are No Sections.</h4>

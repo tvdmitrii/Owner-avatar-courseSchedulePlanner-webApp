@@ -1,14 +1,14 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <h5 class="card-header">${courseListTitle}</h5>
 <c:choose>
-    <c:when test="${hasLoadedCourses}">
+    <c:when test="${page.hasLoadedCourses}">
         <div id="course-list-card-body" class="card-body">
             <div id="course-list" class="overflow-auto">
                 <ul class="list-group align-content-stretch">
-                    <c:forEach var="course" items="${loadedCourses}" varStatus="loop">
+                    <c:forEach var="course" items="${page.loadedCourses}" varStatus="loop">
                         <a href="${pageContext.request.contextPath}/${detailsServlet}?courseListId=${loop.index}"
-                           class="list-group-item ${hasSelectedCourse
-                                                && course.id == selectedCourse.id ? "active" : ""}">
+                           class="list-group-item ${page.hasSelectedCourse
+                                                && course.id == page.selectedCourse.id ? "active" : ""}">
                                 ${course.code}: ${course.title}
                         </a>
                     </c:forEach>
