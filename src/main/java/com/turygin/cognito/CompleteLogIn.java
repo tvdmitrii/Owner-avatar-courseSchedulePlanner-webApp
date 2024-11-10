@@ -13,6 +13,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.UserDTO;
 import com.turygin.states.UserState;
+import com.turygin.states.nav.NavigationState;
 import com.turygin.utility.Config;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
@@ -54,7 +55,7 @@ public class CompleteLogIn extends HttpServlet {
 
         // Check for missing authorization code or if user already logged in
         if (authorizationCode == null || userState != null) {
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
         TokenResponse token = client.getCognitoToken(authorizationCode);
@@ -76,7 +77,7 @@ public class CompleteLogIn extends HttpServlet {
             LOG.error("Authorization failed!", e);
         }
 
-        response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+        response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
     }
 
     private DecodedJWT validateToken(TokenResponse tokenResponse, JwkProvider provider) {

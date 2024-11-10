@@ -1,4 +1,4 @@
-package com.turygin.servlet;
+package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
@@ -8,7 +8,7 @@ import com.turygin.states.BrowseCoursesPageState;
 import java.io.*;
 import java.util.List;
 
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -19,15 +19,13 @@ import jakarta.servlet.annotation.*;
  * REST API and sends it to JSP for display.
  */
 @WebServlet(
-        name = "BrowseCoursesLoadList",
-        urlPatterns = { "", "/browseCoursesLoadList" }
+        name = "LoadCourses",
+        urlPatterns = { "", "/browser/load" }
 )
-public class BrowseCoursesLoadList extends HttpServlet {
-
-    private static final String JSP_URL = "/browseCourses.jsp";
+public class LoadCourses extends HttpServlet {
 
     /** Empty constructor. */
-    public BrowseCoursesLoadList() {}
+    public LoadCourses() {}
 
     /**
      * Handles HTTP GET requests.
@@ -42,7 +40,7 @@ public class BrowseCoursesLoadList extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = new NavigationState("browseCourses");
+        NavigationState navState = NavigationState.BROWSER;
         session.setAttribute("navState", navState);
 
         // Initialize page state
@@ -63,7 +61,7 @@ public class BrowseCoursesLoadList extends HttpServlet {
         // Save page state in session
         session.setAttribute("browseCoursesPage", pageState);
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

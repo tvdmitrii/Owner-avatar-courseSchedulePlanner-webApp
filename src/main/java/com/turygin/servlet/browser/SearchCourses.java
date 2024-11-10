@@ -1,9 +1,9 @@
-package com.turygin.servlet;
+package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.states.BrowseCoursesPageState;
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,17 +23,15 @@ import java.util.List;
  * REST API and sends it to JSP for display.
  */
 @WebServlet(
-        name = "BrowseCoursesSearch",
-        urlPatterns = { "/browseCoursesSearch" }
+        name = "SearchCourses",
+        urlPatterns = { "/browser/search" }
 )
-public class BrowseCoursesSearch extends HttpServlet {
+public class SearchCourses extends HttpServlet {
 
-    protected static final Logger LOG = LogManager.getLogger(BrowseCoursesSearch.class);
-    private static final String JSP_URL = "/browseCourses.jsp";
-    private static final String BROWSE_COURSES_LOAD_SERVLET = "browseCoursesLoadList";
+    protected static final Logger LOG = LogManager.getLogger(SearchCourses.class);
 
     /** Empty constructor. */
-    public BrowseCoursesSearch() {}
+    public SearchCourses() {}
 
     /**
      * Handles HTTP GET requests.
@@ -48,7 +46,7 @@ public class BrowseCoursesSearch extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = new NavigationState("browseCourses");
+        NavigationState navState = NavigationState.BROWSER;
         session.setAttribute("navState", navState);
 
         // Get page state
@@ -57,7 +55,7 @@ public class BrowseCoursesSearch extends HttpServlet {
         if (pageState == null) {
             // Should not be here yet. Course list was not initialized.
             LOG.debug("Page state is null. Leaving search...");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), BROWSE_COURSES_LOAD_SERVLET));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
@@ -94,7 +92,7 @@ public class BrowseCoursesSearch extends HttpServlet {
         // Reset selected course
         pageState.setSelectedCourse(null);
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

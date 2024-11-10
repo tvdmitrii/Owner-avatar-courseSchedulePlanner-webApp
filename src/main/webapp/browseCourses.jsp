@@ -4,11 +4,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="css/bootstrap.min.css"/>
-        <link rel="stylesheet" href="css/fontawesome.css"/>
-        <link rel="stylesheet" href="css/main.css"/>
-        <link rel="stylesheet" href="css/browseCourses.css"/>
-        <script src="js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/fontawesome.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/browseCourses.css"/>
+        <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
         <title>Course Schedule Planner</title>
     </head>
     <body class="d-flex">
@@ -17,7 +17,7 @@
         <c:set var="selectedCourse" scope="request" value="${browseCoursesPage.selectedCourse}"/>
         <c:set var="hasLoadedCourses" scope="request" value="${browseCoursesPage.hasLoadedCourses}"/>
         <c:set var="loadedCourses" scope="request" value="${browseCoursesPage.loadedCourses}"/>
-        <c:set var="detailsServlet" scope="request" value="browseCoursesSelectCourse"/>
+        <c:set var="detailsServlet" scope="request" value="browser/select"/>
         <c:set var="courseListTitle" scope="request" value="Results"/>
         <c:set var="courseListEmptyText" scope="request" value="No Results."/>
         <main class="d-flex">

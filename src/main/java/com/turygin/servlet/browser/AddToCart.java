@@ -1,8 +1,8 @@
-package com.turygin.servlet;
+package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.states.BrowseCoursesPageState;
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import com.turygin.states.UserState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -23,40 +23,40 @@ import java.io.IOException;
  * REST API and sends it to JSP for display.
  */
 @WebServlet(
-        name = "BrowseCoursesAddToCart",
-        urlPatterns = { "/browseCoursesAddToCart" }
+        name = "AddToCart",
+        urlPatterns = { "/browser/addToCart" }
 )
-public class BrowseCoursesAddToCart extends HttpServlet {
+public class AddToCart extends HttpServlet {
 
-    private static final Logger LOG = LogManager.getLogger(BrowseCoursesAddToCart.class);
-    private static final String JSP_URL = "/browseCourses.jsp";
+    private static final Logger LOG = LogManager.getLogger(AddToCart.class);
 
     /** Empty constructor. */
-    public BrowseCoursesAddToCart() {}
+    public AddToCart() {}
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = NavigationState.BROWSER;
+        session.setAttribute("navState", navState);
+
         // Check that logged in.
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null) {
             // Not logged in.
             LOG.warn("Unauthenticated user access.");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
-
-        // Set navigation state
-        NavigationState navState = new NavigationState("browseCourses");
-        session.setAttribute("navState", navState);
 
         // Get page state
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
         // Make sure course is selected
         if (pageState == null || !pageState.getHasSelectedCourse()) {
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
@@ -70,7 +70,7 @@ public class BrowseCoursesAddToCart extends HttpServlet {
             pageState.setSelectedCourse(null);
         }
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

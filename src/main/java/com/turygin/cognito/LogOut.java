@@ -1,5 +1,6 @@
 package com.turygin.cognito;
 
+import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,6 @@ public class LogOut extends HttpServlet {
 
         HttpSession session = request.getSession();
         session.setAttribute("userState", null);
-        response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+        response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
     }
 }

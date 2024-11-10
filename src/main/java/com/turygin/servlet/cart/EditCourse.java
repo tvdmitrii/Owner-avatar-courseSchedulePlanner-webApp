@@ -1,8 +1,8 @@
-package com.turygin.servlet;
+package com.turygin.servlet.cart;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseWithSectionsDTO;
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import com.turygin.states.UserState;
 import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.RequestDispatcher;
@@ -22,16 +22,15 @@ import java.util.stream.Stream;
 
 
 @WebServlet(
-        name = "ViewCartModifyCourse",
-        urlPatterns = { "/viewCartModifyCourse" }
+        name = "CartEditCourse",
+        urlPatterns = { "/cart/edit" }
 )
-public class ViewCartModifyCourse extends HttpServlet {
+public class EditCourse extends HttpServlet {
 
-    private static final Logger LOG = LogManager.getLogger(ViewCartModifyCourse.class);
-    private static final String JSP_URL = "/viewCart.jsp";
+    private static final Logger LOG = LogManager.getLogger(EditCourse.class);
 
     /** Empty constructor. */
-    public ViewCartModifyCourse() {}
+    public EditCourse() {}
 
     private void updateCourse(HttpServletRequest request, UserState user, ViewCartPageState pageState, RestClient client) {
         // Convert comma-delimited string to list of longs ...
@@ -61,18 +60,19 @@ public class ViewCartModifyCourse extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = NavigationState.CART;
+        session.setAttribute("navState", navState);
+
         // Check that logged in.
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null) {
             // Not logged in.
             LOG.warn("Unauthenticated user access.");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
-
-        // Set navigation state
-        NavigationState navState = new NavigationState("viewCart");
-        session.setAttribute("navState", navState);
 
         // Get page state
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
@@ -80,7 +80,7 @@ public class ViewCartModifyCourse extends HttpServlet {
         // Check that view cart page was initialized and a course is selected
         if (pageState == null || !pageState.getHasSelectedCourse()) {
             LOG.warn("No course selected or cart courses not loaded.");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "viewCart"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
@@ -107,7 +107,7 @@ public class ViewCartModifyCourse extends HttpServlet {
             LOG.warn("Could not update course via REST API. Exception: {}", e.getMessage());
         }
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

@@ -1,6 +1,6 @@
-package com.turygin.servlet;
+package com.turygin.servlet.cart;
 
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import com.turygin.states.UserState;
 import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.RequestDispatcher;
@@ -16,15 +16,13 @@ import java.io.IOException;
 
 
 @WebServlet(
-        name = "ViewCartSelectCourse",
-        urlPatterns = { "/viewCartSelectCourse" }
+        name = "CartSelectCourse",
+        urlPatterns = { "/cart/select" }
 )
-public class ViewCartSelectCourse extends HttpServlet {
-
-    private static final String JSP_URL = "/viewCart.jsp";
+public class SelectCourse extends HttpServlet {
 
     /** Empty constructor. */
-    public ViewCartSelectCourse() {}
+    public SelectCourse() {}
 
     /**
      * Handles HTTP GET requests.
@@ -38,24 +36,24 @@ public class ViewCartSelectCourse extends HttpServlet {
 
         HttpSession session = request.getSession();
 
+        // Set navigation state
+        NavigationState navState = NavigationState.CART;
+        session.setAttribute("navState", navState);
+
         // Check that logged in.
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null) {
             // Not logged in.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
-
-        // Set navigation state
-        NavigationState navState = new NavigationState("viewCart");
-        session.setAttribute("navState", navState);
 
         // Get page state
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
         // Check that cart course list was initialized.
         if (pageState == null) {
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "viewCart"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
@@ -68,7 +66,7 @@ public class ViewCartSelectCourse extends HttpServlet {
             pageState.setSelectedCourseId(-1);
         }
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

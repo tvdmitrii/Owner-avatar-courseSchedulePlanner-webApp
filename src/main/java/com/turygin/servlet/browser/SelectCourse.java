@@ -1,10 +1,8 @@
-package com.turygin.servlet;
+package com.turygin.servlet.browser;
 
-import com.turygin.api.client.RestClient;
-import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.states.BrowseCoursesPageState;
 
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
 
 
 /**
@@ -21,16 +18,13 @@ import java.util.List;
  * REST API and sends it to JSP for display.
  */
 @WebServlet(
-        name = "BrowseCoursesSelectCourse",
-        urlPatterns = { "/browseCoursesSelectCourse" }
+        name = "BrowserSelectCourse",
+        urlPatterns = { "/browser/select" }
 )
-public class BrowseCoursesSelectCourse extends HttpServlet {
-
-    private static final String JSP_URL = "/browseCourses.jsp";
-    private static final String BROWSE_COURSES_LOAD_SERVLET = "browseCoursesLoadList";
+public class SelectCourse extends HttpServlet {
 
     /** Empty constructor. */
-    public BrowseCoursesSelectCourse() {}
+    public SelectCourse() {}
 
     /**
      * Handles HTTP GET requests.
@@ -45,7 +39,7 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = new NavigationState("browseCourses");
+        NavigationState navState = NavigationState.BROWSER;
         session.setAttribute("navState", navState);
 
         // Get page state
@@ -53,7 +47,7 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
 
         if (pageState == null) {
             // Should not be here yet. Course list was not initialized.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), BROWSE_COURSES_LOAD_SERVLET));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
@@ -66,7 +60,7 @@ public class BrowseCoursesSelectCourse extends HttpServlet {
             pageState.setSelectedCourse(null);
         }
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

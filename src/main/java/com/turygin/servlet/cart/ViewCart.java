@@ -1,15 +1,12 @@
-package com.turygin.servlet;
+package com.turygin.servlet.cart;
 
 import com.turygin.api.client.RestClient;
-import com.turygin.api.model.CourseBasicDTO;
 import com.turygin.api.model.CourseWithSectionsDTO;
-import com.turygin.api.model.DepartmentBasicDTO;
-import com.turygin.states.BrowseCoursesPageState;
 
 import java.io.*;
 import java.util.List;
 
-import com.turygin.states.NavigationState;
+import com.turygin.states.nav.NavigationState;
 import com.turygin.states.UserState;
 import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.*;
@@ -23,11 +20,9 @@ import jakarta.servlet.annotation.*;
  */
 @WebServlet(
         name = "ViewCart",
-        urlPatterns = { "/viewCart" }
+        urlPatterns = { "/cart/view" }
 )
 public class ViewCart extends HttpServlet {
-
-    private static final String JSP_URL = "/viewCart.jsp";
 
     /** Empty constructor. */
     public ViewCart() {}
@@ -43,16 +38,17 @@ public class ViewCart extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+
+        // Set navigation state
+        NavigationState navState = NavigationState.CART;
+        session.setAttribute("navState", navState);
+
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null) {
             // Not logged in.
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), "browseCoursesLoadList"));
+            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
-
-        // Set navigation state
-        NavigationState navState = new NavigationState("viewCart");
-        session.setAttribute("navState", navState);
 
         // Initialize page state
         ViewCartPageState pageState = new ViewCartPageState();
@@ -68,7 +64,7 @@ public class ViewCart extends HttpServlet {
         // Save page state in session
         session.setAttribute("viewCartPage", pageState);
 
-        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(JSP_URL);
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }
 }

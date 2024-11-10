@@ -11,13 +11,13 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link ${navState.currentPage == 'browseCourses' ? "active" : ""}"
-                           href="${pageContext.request.contextPath}/browseCoursesLoadList">Browse</a>
+                        <a class="nav-link ${navState.name == 'browser' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/browser/load">Browse</a>
                     </li>
                     <c:if test="${userState != null}">
                         <li class="nav-item">
-                            <a class="nav-link ${navState.currentPage == 'viewCart' ? "active" : ""}"
-                               href="${pageContext.request.contextPath}/viewCart">My Courses</a>
+                            <a class="nav-link ${navState.name == 'cart' ? "active" : ""}"
+                               href="${pageContext.request.contextPath}/cart/view">My Courses</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">My Schedules</a>

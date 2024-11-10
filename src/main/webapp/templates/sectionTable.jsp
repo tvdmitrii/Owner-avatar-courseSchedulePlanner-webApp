@@ -3,7 +3,7 @@
 <c:choose>
     <c:when test="${hasSelectedCourse && hasSections}">
         <div id="section-list-card-body" class="card-body">
-            <form action="${pageContext.request.contextPath}/viewCartModifyCourse" method="POST">
+            <form action="${pageContext.request.contextPath}/cart/edit" method="POST">
                 <div id="section-table" class="overflow-auto">
                     <table class="table table-striped">
                         <thead>
@@ -44,7 +44,7 @@
                 <h4 class="card-title mt-1 d-flex align-self-center">There Are No Sections.</h4>
             </div>
             <div class="d-flex">
-                <form action="${pageContext.request.contextPath}/viewCartModifyCourse" method="POST">
+                <form action="${pageContext.request.contextPath}/cart/edit" method="POST">
                     <button type="submit" name="action" value="delete" class="btn btn-danger">Remove</button>
                 </form>
             </div>
