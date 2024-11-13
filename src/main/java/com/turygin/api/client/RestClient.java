@@ -134,6 +134,25 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
                 get(new GenericType<List<CourseBasicDTO>>() {});
     }
 
+    public void deleteCourse(long courseId) {
+        client.target(getCourseUrl()).path(String.valueOf(courseId)).request().delete();
+    }
+
+    public CourseBasicDTO addCourse(CourseBasicDTO courseBasicDTO) {
+        try (Response response = client.target(getCourseUrl()).
+                request(MediaType.APPLICATION_JSON).post(Entity.entity(courseBasicDTO, MediaType.APPLICATION_JSON))) {
+            return response.readEntity(CourseBasicDTO.class);
+        }
+    }
+
+    @Override
+    public CourseBasicDTO updateCourse(CourseBasicDTO courseBasicDTO) {
+        try (Response response = client.target(getCourseUrl()).
+                request(MediaType.APPLICATION_JSON).put(Entity.entity(courseBasicDTO, MediaType.APPLICATION_JSON))) {
+            return response.readEntity(CourseBasicDTO.class);
+        }
+    }
+
     /**
      * Fetches department information using unique department ID.
      * @param id unique department ID

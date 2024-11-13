@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <h5 class="card-header">Course Editor</h5>
 <div class="card-body">
-  <form action="${pageContext.request.contextPath}/admin/addCourse" method="POST">
+  <form action="${pageContext.request.contextPath}/admin/course/edit" method="POST">
     <div class="mb-3">
       <label for="new-course-title-input" class="form-label">Course Title</label>
       <input type="text" class="form-control" id="new-course-title-input" name="title"
