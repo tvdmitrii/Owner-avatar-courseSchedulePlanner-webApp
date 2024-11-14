@@ -14,8 +14,7 @@ import java.io.IOException;
 
 
 /**
- * Sample servlet that fetches information about all courses form the
- * REST API and sends it to JSP for display.
+ * Selects a course from a course list on the course browser page.
  */
 @WebServlet(
         name = "BrowserSelectCourse",

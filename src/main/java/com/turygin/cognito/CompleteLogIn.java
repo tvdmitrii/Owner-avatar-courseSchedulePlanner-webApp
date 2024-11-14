@@ -17,6 +17,7 @@ import com.turygin.states.nav.NavigationState;
 import com.turygin.utility.Config;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +30,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 
+/** Verifies JWT token received from Cognito, loads the user data from the database. */
 @WebServlet(
         urlPatterns = {"/completeLogIn"}
 )
@@ -58,9 +60,10 @@ public class CompleteLogIn extends HttpServlet {
             response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
             return;
         }
-        TokenResponse token = client.getCognitoToken(authorizationCode);
 
         try {
+            TokenResponse token = client.getCognitoToken(authorizationCode);
+
             DecodedJWT jwt = validateToken(token, cognitoJwkProvider);
             assert jwt != null;
 
@@ -80,6 +83,12 @@ public class CompleteLogIn extends HttpServlet {
         response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
     }
 
+    /**
+     * Decodes and validates JWT token received from Cognito.
+     * @param tokenResponse token response from Cognito
+     * @param provider JWK provider
+     * @return decoded JWT
+     */
     private DecodedJWT validateToken(TokenResponse tokenResponse, JwkProvider provider) {
         try {
             // Decode the token to get the key ID (kid)
@@ -118,6 +127,11 @@ public class CompleteLogIn extends HttpServlet {
         return null;
     }
 
+    /**
+     * Gets claims from JWT token provided.
+     * @param jwt JWT token
+     * @return user state variable if successful, null otherwise
+     */
     private UserState getJwtClaims(DecodedJWT jwt) {
         try {
             UserState userState = new UserState();
@@ -140,7 +154,7 @@ public class CompleteLogIn extends HttpServlet {
 
             return userState;
         } catch (IllegalArgumentException illegalArgumentException) {
-            LOG.error("Could not Cognito UUID!", illegalArgumentException);
+            LOG.error("Could not parse Cognito UUID!", illegalArgumentException);
         } catch (AssertionError assertionError) {
             LOG.error("One of the claims is missing!", assertionError);
         } catch (Exception e) {
@@ -150,11 +164,23 @@ public class CompleteLogIn extends HttpServlet {
         return null;
     }
 
+    /**
+     * Loads user information from the database based on UUID.
+     * @param userState user state variable
+     * @param restClient REST API client
+     */
     private void populateUserFromDatabase(UserState userState, RestClient restClient) {
-        UserDTO userDto = restClient.createUserIfNotExists(userState.getCognitoUuid().toString());
-        userState.setIsAdmin(userDto.isAdmin());
-        userState.setIsNew(userDto.isNewUser());
-        userState.setUserId(userDto.getId());
+        Response userResponse = restClient.createUserIfNotExists(userState.getCognitoUuid().toString());
+        if (RestClient.isStatusSuccess(userResponse)) {
+            UserDTO userDto = RestClient.getDTO(userResponse, UserDTO.class);
+            userState.setIsAdmin(userDto.isAdmin());
+            userState.setIsNew(userDto.isNewUser());
+            userState.setUserId(userDto.getId());
+        } else {
+            String error = RestClient.getErrorMessage(userResponse);
+            LOG.error(error);
+            throw new RuntimeException(error);
+        }
     }
 }
 

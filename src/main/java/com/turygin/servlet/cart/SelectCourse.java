@@ -14,7 +14,9 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 
-
+/**
+ * Selects a course in cart and displays section information.
+ */
 @WebServlet(
         name = "CartSelectCourse",
         urlPatterns = { "/cart/select" }

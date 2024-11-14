@@ -12,11 +12,11 @@ import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.ws.rs.core.Response;
 
 
 /**
- * Sample servlet that fetches information about all courses form the
- * REST API and sends it to JSP for display.
+ * Loads courses with sections from REST API to display on the cart page.
  */
 @WebServlet(
         name = "ViewCart",
@@ -52,12 +52,32 @@ public class ViewCart extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Fetch cart course info from API
-        List<CourseWithSectionsDTO> courses = client.cartGetCourses(user.getUserId());
-        pageState.setCourses(courses);
+        Response coursesResponse = client.cartGetCourses(user.getUserId());
+        if (RestClient.isStatusSuccess(coursesResponse)) {
+            List<CourseWithSectionsDTO> courses = RestClient.getDTOList(coursesResponse, CourseWithSectionsDTO.class);
+            pageState.setCourses(courses);
+        } else {
+            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
+            forwardToJsp(request, response, navState);
+            return;
+        }
 
         // Save page state in session
         session.setAttribute("viewCartPage", pageState);
 
+        forwardToJsp(request, response, navState);
+    }
+
+    /**
+     * Helper method that forwards to a JSP.
+     * @param request client request
+     * @param response response object
+     * @param navState navigation state object
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
+            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

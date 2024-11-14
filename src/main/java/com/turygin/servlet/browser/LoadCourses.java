@@ -1,8 +1,8 @@
 package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
-import com.turygin.api.model.CourseBasicDTO;
-import com.turygin.api.model.DepartmentBasicDTO;
+import com.turygin.api.model.CourseDTO;
+import com.turygin.api.model.DepartmentDTO;
 import com.turygin.states.BrowseCoursesPageState;
 
 import java.io.*;
@@ -12,11 +12,11 @@ import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.ws.rs.core.Response;
 
 
 /**
- * Sample servlet that fetches information about all courses form the
- * REST API and sends it to JSP for display.
+ * Loads information for course browser page included courses and departments from REST API.
  */
 @WebServlet(
         name = "LoadCourses",
@@ -51,16 +51,43 @@ public class LoadCourses extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Fetch department info from the API
-        List<DepartmentBasicDTO> departments = client.getAllDepartments();
-        pageState.setDepartments(departments);
+        Response departmentsResponse = client.getAllDepartments();
+        if(RestClient.isStatusSuccess(departmentsResponse)){
+            List<DepartmentDTO> departments = RestClient.getDTOList(departmentsResponse, DepartmentDTO.class);
+            pageState.setDepartments(departments);
+        } else {
+            request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));
+            forwardToJsp(request, response, navState);
+            return;
+        }
 
         // Fetch course info from the API
-        List<CourseBasicDTO> courses = client.getAllCourses();
-        pageState.setCourses(courses);
+        Response coursesResponse = client.getAllCourses();
+        if(RestClient.isStatusSuccess(coursesResponse)){
+            List<CourseDTO> courses = RestClient.getDTOList(coursesResponse, CourseDTO.class);
+            pageState.setCourses(courses);
+        } else {
+            request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));
+            forwardToJsp(request, response, navState);
+            return;
+        }
 
         // Save page state in session
         session.setAttribute("browseCoursesPage", pageState);
 
+        forwardToJsp(request, response, navState);
+    }
+
+    /**
+     * Helper method that forwards to a JSP.
+     * @param request client request
+     * @param response response object
+     * @param navState navigation state object
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
+            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

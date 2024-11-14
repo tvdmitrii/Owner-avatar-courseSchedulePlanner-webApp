@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +21,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
-
+/**
+ * Handles removing a course from the cart or updating its selected sections.
+ */
 @WebServlet(
         name = "CartEditCourse",
         urlPatterns = { "/cart/edit" }
@@ -32,7 +35,15 @@ public class EditCourse extends HttpServlet {
     /** Empty constructor. */
     public EditCourse() {}
 
-    private void updateCourse(HttpServletRequest request, UserState user, ViewCartPageState pageState, RestClient client) {
+    /**
+     * Handles the update course sections request.
+     * @param request user request
+     * @param user user state variable
+     * @param pageState page state variable
+     * @param client REST API client
+     */
+    private void updateCourse(HttpServletRequest request, UserState user, ViewCartPageState pageState,
+                              RestClient client) {
         // Convert comma-delimited string to list of longs ...
         String[] idStrings = request.getParameterValues("sectionIds");
         // If user unselects all sections, empty array will not be transmitted
@@ -44,18 +55,28 @@ public class EditCourse extends HttpServlet {
         LOG.debug("Parsed section IDs: {}", sectionIds);
 
         // Update course selection on the server
-        CourseWithSectionsDTO updatedCourse = client.
-                cartUpdateCourse(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds);
-
-        // Update course selection on the client
-        if (updatedCourse != null) {
+        Response courseResponse = client.
+                cartUpdateSections(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds);
+        if(RestClient.isStatusSuccess(courseResponse)) {
+            CourseWithSectionsDTO updatedCourse = RestClient.getDTO(courseResponse, CourseWithSectionsDTO.class);
             pageState.getCourses().updateSelected(updatedCourse);
-            LOG.debug("Course updated: {}", updatedCourse);
+            request.setAttribute("success", String.format("Section selection for %s has been updated.",
+                    updatedCourse.getCode()));
+            LOG.debug("Course updated: {}", updatedCourse.toString());
         } else {
-            LOG.debug("REST API could not update the course.");
+            String error = RestClient.getErrorMessage(courseResponse);
+            LOG.error(error);
+            request.setAttribute("error", error);
         }
     }
 
+    /**
+     * Handles HTTP POST requests.
+     * @param request object that contains the client's request information
+     * @param response object used to send the response back to the client
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -88,9 +109,16 @@ public class EditCourse extends HttpServlet {
                 LOG.debug("Updating course.");
                 updateCourse(request, user, pageState, client);
             } else if (action.equals("delete")) {
-                LOG.debug("Removing course.");
-                client.cartRemoveCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
-                pageState.getCourses().removeSelected();
+                Response removeResponse = client.cartRemoveCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
+                if(RestClient.isStatusSuccess(removeResponse)) {
+                    pageState.getCourses().removeSelected();
+                    LOG.debug("Removed course.");
+                    removeResponse.close();
+                } else {
+                    String error = RestClient.getErrorMessage(removeResponse);
+                    LOG.error(error);
+                    request.setAttribute("error", error);
+                }
             } else {
                 LOG.warn("Unknown action: {}.", action);
             }

@@ -1,9 +1,10 @@
 package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
-import com.turygin.api.model.CourseBasicDTO;
+import com.turygin.api.model.CourseDTO;
 import com.turygin.states.BrowseCoursesPageState;
 import com.turygin.states.nav.NavigationState;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,8 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Sample servlet that fetches information about all courses form the
- * REST API and sends it to JSP for display.
+ * Performs a course search via REST API and updates the course list of course browser.
  */
 @WebServlet(
         name = "SearchCourses",
@@ -68,7 +68,7 @@ public class SearchCourses extends HttpServlet {
             pageState.getDepartments().setSelectedId(departmentListId);
             LOG.debug("Found search department with ID '{}'.", departmentListId);
         } catch (Exception e) {
-            LOG.debug("Department search missing. Reset selection.");
+            LOG.debug("Department ID is missing. Reset selection.");
             pageState.getDepartments().resetSelected();
         }
 
@@ -77,14 +77,33 @@ public class SearchCourses extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Search for courses using API
-        List<CourseBasicDTO> courses = client.findCourses(pageState.getTitleSearchTerm(),
+        Response coursesResponse = client.findCourses(pageState.getTitleSearchTerm(),
                 pageState.getDepartments().getSelected().getId());
-        pageState.setCourses(courses);
-        LOG.debug("Found {} courses.", courses.size());
+        if (RestClient.isStatusSuccess(coursesResponse)) {
+            List<CourseDTO> courses = RestClient.getDTOList(coursesResponse, CourseDTO.class);
+            pageState.setCourses(courses);
+            LOG.debug("Found {} courses.", courses.size());
+        } else {
+            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
+            forwardToJsp(request, response, navState);
+        }
 
         // Reset selected course
         pageState.getCourses().resetSelected();
 
+        forwardToJsp(request, response, navState);
+    }
+
+    /**
+     * Helper method that forwards to a JSP.
+     * @param request client request
+     * @param response response object
+     * @param navState navigation state object
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
+            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

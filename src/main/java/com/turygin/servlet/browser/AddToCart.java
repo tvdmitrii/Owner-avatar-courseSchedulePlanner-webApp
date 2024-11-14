@@ -1,6 +1,7 @@
 package com.turygin.servlet.browser;
 
 import com.turygin.api.client.RestClient;
+import com.turygin.api.model.CourseDTO;
 import com.turygin.states.BrowseCoursesPageState;
 import com.turygin.states.nav.NavigationState;
 import com.turygin.states.UserState;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,8 +21,7 @@ import java.io.IOException;
 
 
 /**
- * Sample servlet that fetches information about all courses form the
- * REST API and sends it to JSP for display.
+ * Adds selected course to users cart.
  */
 @WebServlet(
         name = "AddToCart",
@@ -33,6 +34,13 @@ public class AddToCart extends HttpServlet {
     /** Empty constructor. */
     public AddToCart() {}
 
+    /**
+     * Handles HTTP POST requests.
+     * @param request object that contains the client's request information
+     * @param response object used to send the response back to the client
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -57,7 +65,7 @@ public class AddToCart extends HttpServlet {
         // Make sure course is selected
         if (!pageState.getCourses().getHasSelected()) {
             response.sendRedirect(String.format("%s/%s", request.getContextPath(),
-                    NavigationState.CART.getDefaultServlet()));
+                    NavigationState.BROWSER.getDefaultServlet()));
             return;
         }
 
@@ -65,7 +73,14 @@ public class AddToCart extends HttpServlet {
             // Add course to cart ...
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
-            client.cartAddCourseToCart(user.getUserId(), pageState.getCourses().getSelected().getId());
+            Response cartAddCourseResponse =
+                    client.cartAddCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
+            if(RestClient.isStatusSuccess(cartAddCourseResponse)) {
+                CourseDTO addedCourse = RestClient.getDTO(cartAddCourseResponse, CourseDTO.class);
+                request.setAttribute("success", String.format("%s has been added to cart.", addedCourse.getCode()));
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(cartAddCourseResponse));
+            }
         } catch (Exception e) {
             // ... or remove selection
             pageState.getCourses().resetSelected();
