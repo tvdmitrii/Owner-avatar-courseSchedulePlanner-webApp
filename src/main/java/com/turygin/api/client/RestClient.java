@@ -1,8 +1,7 @@
 package com.turygin.api.client;
 
-import com.turygin.api.model.CourseWithSectionsDTO;
-import com.turygin.api.model.UserDTO;
-import com.turygin.api.resource.ICartResourse;
+import com.turygin.api.model.ErrorDTO;
+import com.turygin.api.resource.ICartResource;
 import com.turygin.api.resource.IUserResource;
 import com.turygin.utility.Config;
 import com.turygin.cognito.TokenResponse;
@@ -13,8 +12,7 @@ import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 
-import com.turygin.api.model.CourseBasicDTO;
-import com.turygin.api.model.DepartmentBasicDTO;
+import com.turygin.api.model.CourseDTO;
 import com.turygin.api.resource.ICourseResource;
 import com.turygin.api.resource.IDepartmentResource;
 import jakarta.ws.rs.core.Response;
@@ -26,18 +24,72 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * REST API client that implements ICourseRepository interface.
+ * REST API client implementation.
  */
-public class RestClient implements ICourseResource, IDepartmentResource, IUserResource, ICartResourse {
+public class RestClient implements ICourseResource, IDepartmentResource, IUserResource, ICartResource {
 
+    /** Base API url. */
     private final String baseUrl;
+
+    /** Jersey REST API client. */
     private final Client client;
 
     private static final Logger LOG = LogManager.getLogger(RestClient.class);
 
+    /**
+     * Instantiates REST API client.
+     * @param baseUrl base API url
+     */
     public RestClient(String baseUrl) {
         this.baseUrl = baseUrl;
         client = ClientBuilder.newClient();
+    }
+
+    /** Checks whether response has a successful status code.
+     *
+     * @param response REST API response
+     * @return true if status is between 200 and 300, false otherwise
+     */
+    public static boolean isStatusSuccess(Response response) {
+        return response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL);
+    }
+
+    /**
+     * Reads a DTO entity from response and closes the response.
+     * @param response REST API response
+     * @param entityType entity class type
+     * @return DTO entity
+     * @param <T> the DTO entity type
+     */
+    public static <T> T getDTO(Response response, Class<T> entityType) {
+        T entity = response.readEntity(entityType);
+        response.close();
+        return entity;
+    }
+
+    /**
+     * Reads a list of DTO entities from response and closes the response.
+     * @param response REST API response
+     * @param entityType entity class type
+     * @return DTO entity list
+     * @param <T> the DTO entity type
+     */
+    public static <T> List<T> getDTOList(Response response, Class<T> entityType) {
+        GenericType<List<T>> listType = new GenericType<List<T>>(entityType) {};
+        List<T> entityList = response.readEntity(listType);
+        response.close();
+        return entityList;
+    }
+
+    /**
+     * Creates an error message from error DTO in response and closes the response.
+     * @param response REST API response
+     * @return error message containing status code and description
+     */
+    public static String getErrorMessage(Response response) {
+        ErrorDTO error = response.readEntity(ErrorDTO.class);
+        response.close();
+        return String.format("Status: %d. Error: %s", error.getStatus(), error.getMessage());
     }
 
     /**
@@ -72,6 +124,11 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
         return String.format("%s/%s", baseUrl, "user");
     }
 
+    /**
+     * Fetches AWS Cognito JWT token based on authorization code.
+     * @param authorizationCode authorization code
+     * @return cognito JWT token response
+     */
     public TokenResponse getCognitoToken(String authorizationCode)
     {
         Properties webAppProps = Config.getProperties();
@@ -94,7 +151,7 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
                 accept(MediaType.APPLICATION_JSON).
                 post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE))) {
 
-            LOG.debug("Response status {} {}.", response.getStatus(),
+            LOG.debug("Cognito token response status {} {}.", response.getStatus(),
                     response.getStatusInfo().getReasonPhrase());
 
             return response.readEntity(TokenResponse.class);
@@ -104,119 +161,139 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
     /**
      * Fetches course information using unique course ID.
      * @param id unique course ID
-     * @return course information
+     * @return course DTO
      */
-    public CourseBasicDTO getCourse(long id) {
-        return client.target(getCourseUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).
-                get(CourseBasicDTO.class);
+    public Response getCourse(long id) {
+        return client.target(getCourseUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).get();
     }
 
     /**
      * Fetches information about all courses as a list.
-     * @return a list of course information objects
+     * @return a list of course DTOs
      */
-    public List<CourseBasicDTO> getAllCourses() {
-        return client.target(getCourseUrl()).request(MediaType.APPLICATION_JSON).
-                get(new GenericType<List<CourseBasicDTO>>() {});
+    public Response getAllCourses() {
+        return client.target(getCourseUrl()).request(MediaType.APPLICATION_JSON).get();
     }
 
     /**
      * Fetches information about all courses that match search criteria.
      * @param title partial course title
      * @param departmentId departmentId
-     * @return a list of course information objects
+     * @return a list of course DTOs
      */
-    public List<CourseBasicDTO> findCourses(String title, long departmentId) {
+    public Response findCourses(String title, long departmentId) {
         return client.target(String.format("%s/%s", getCourseUrl(), "find")).
                 queryParam("title", title).
                 queryParam("departmentId", departmentId).
-                request(MediaType.APPLICATION_JSON).
-                get(new GenericType<List<CourseBasicDTO>>() {});
+                request(MediaType.APPLICATION_JSON).get();
     }
 
-    public void deleteCourse(long courseId) {
-        client.target(getCourseUrl()).path(String.valueOf(courseId)).request().delete();
+    /**
+     * Removes a course.
+     * @param courseId course ID
+     * @return 204 status if successful
+     */
+    public Response deleteCourse(long courseId) {
+        return client.target(getCourseUrl()).path(String.valueOf(courseId)).request().delete();
     }
 
-    public CourseBasicDTO addCourse(CourseBasicDTO courseBasicDTO) {
-        try (Response response = client.target(getCourseUrl()).
-                request(MediaType.APPLICATION_JSON).post(Entity.entity(courseBasicDTO, MediaType.APPLICATION_JSON))) {
-            return response.readEntity(CourseBasicDTO.class);
-        }
+    /**
+     * Adds a new course
+     * @param courseDTO new course DTO
+     * @return 201 status with up-to-date new course DTO
+     */
+    public Response addCourse(CourseDTO courseDTO) {
+        return client.target(getCourseUrl()).
+                request(MediaType.APPLICATION_JSON).post(Entity.entity(courseDTO, MediaType.APPLICATION_JSON));
     }
 
-    @Override
-    public CourseBasicDTO updateCourse(CourseBasicDTO courseBasicDTO) {
-        try (Response response = client.target(getCourseUrl()).
-                request(MediaType.APPLICATION_JSON).put(Entity.entity(courseBasicDTO, MediaType.APPLICATION_JSON))) {
-            return response.readEntity(CourseBasicDTO.class);
-        }
+    /**
+     * Updates an existing course.
+     * @param courseDTO course DTO with the new information
+     * @return updated course DTO
+     */
+    public Response updateCourse(CourseDTO courseDTO) {
+        return client.target(getCourseUrl()).
+                request(MediaType.APPLICATION_JSON).put(Entity.entity(courseDTO, MediaType.APPLICATION_JSON));
     }
 
     /**
      * Fetches department information using unique department ID.
      * @param id unique department ID
-     * @return department information
+     * @return department DTO
      */
-    public DepartmentBasicDTO getDepartment(long id) {
-        return client.target(getDepartmentUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).
-                get(DepartmentBasicDTO.class);
+    public Response getDepartment(long id) {
+        return client.target(getDepartmentUrl()).path(String.valueOf(id)).request(MediaType.APPLICATION_JSON).get();
     }
 
     /**
      * Fetches information about all departments as a list.
-     * @return a list of department information objects
+     * @return a list of department DTOs
      */
-    public List<DepartmentBasicDTO> getAllDepartments() {
-        return client.target(getDepartmentUrl()).request(MediaType.APPLICATION_JSON).
-                get(new GenericType<List<DepartmentBasicDTO>>() {});
+    public Response getAllDepartments() {
+        return client.target(getDepartmentUrl()).request(MediaType.APPLICATION_JSON).get();
     }
 
 
     /**
-     * Create user if does not exist and get their information.
+     * Creates a user if the user does not exist and loads their information.
      * @param uuid UUID from Cognito
-     * @return user information object
+     * @return user DTO
      */
-    public UserDTO createUserIfNotExists(String uuid) {
+    public Response createUserIfNotExists(String uuid) {
 
         Form form = new Form();
         form.param("uuid", uuid);
 
-        try (Response response = client.target(getUserUrl()).
+        return client.target(getUserUrl()).
                 request(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
                 accept(MediaType.APPLICATION_JSON_TYPE).
-                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE))) {
-
-            LOG.debug("Response status {} {}.", response.getStatus(),
-                    response.getStatusInfo().getReasonPhrase());
-
-            return response.readEntity(UserDTO.class);
-        }
+                post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
     }
 
-    public List<CourseWithSectionsDTO> cartGetCourses(long userId) {
-        return client.target(getCartUrl()).path(String.valueOf(userId)).request(MediaType.APPLICATION_JSON).
-                get(new GenericType<List<CourseWithSectionsDTO>>() {});
+    /**
+     * Get all courses in user's cart.
+     * @param userId user ID
+     * @return a list of course with sections DTOs
+     */
+    public Response cartGetCourses(long userId) {
+        return client.target(getCartUrl()).path(String.valueOf(userId)).request(MediaType.APPLICATION_JSON).get();
     }
 
-    public void cartAddCourseToCart(long userId, long courseId) {
-        client.target(getCartUrl() + "/{userId}/course/{courseId}").
+    /**
+     * Adds a new course to user's cart.
+     * @param userId user ID
+     * @param courseId course ID
+     * @return course DTO containing information about the course
+     */
+    public Response cartAddCourse(long userId, long courseId) {
+        return client.target(getCartUrl() + "/{userId}/course/{courseId}").
                 resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).request().
                 post(Entity.json(""));
     }
 
-    public void cartRemoveCourse(long userId, long courseId) {
-        client.target(getCartUrl() + "/{userId}/course/{courseId}").
+    /**
+     * Removes a course from user's cart.
+     * @param userId user ID
+     * @param courseId course ID
+     * @return 204 status if the course was removed
+     */
+    public Response cartRemoveCourse(long userId, long courseId) {
+        return client.target(getCartUrl() + "/{userId}/course/{courseId}").
                 resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).request().
                 delete();
     }
 
-    public CourseWithSectionsDTO cartUpdateCourse(long userId, long courseId, List<Long> sectionIds) {
-        try (Response response = client.target(getCartUrl() + "/{userId}/course/{courseId}").
+    /**
+     * Updates selected course sections in user's cart.
+     * @param userId user ID
+     * @param courseId course ID
+     * @param sectionIds a list of selected section IDs
+     * @return updated course with sections DTO
+     */
+    public Response cartUpdateSections(long userId, long courseId, List<Long> sectionIds) {
+        return client.target(getCartUrl() + "/{userId}/course/{courseId}").
                 resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).
-                request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionIds, MediaType.APPLICATION_JSON))) {
-            return response.readEntity(CourseWithSectionsDTO.class);
-        }
+                request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionIds, MediaType.APPLICATION_JSON));
     }
 }
