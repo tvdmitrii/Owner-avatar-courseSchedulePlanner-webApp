@@ -1,14 +1,14 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <h5 class="card-header">Course Description</h5>
 <c:choose>
-  <c:when test="${browseCoursesPage.courses.hasSelected}">
+  <c:when test="${courses.hasSelected}">
     <div class="card-body">
-      <h4 class="card-title mt-1">${browseCoursesPage.courses.selected.title}</h4>
-      <h5 class="card-title mb-5">${browseCoursesPage.courses.selected.code}</h5>
+      <h4 class="card-title mt-1">${courses.selected.title}</h4>
+      <h5 class="card-title mb-5">${courses.selected.code}</h5>
       <h6 class="card-title">Description:</h6>
-      <p class="card-text">${browseCoursesPage.courses.selected.description}</p>
+      <p class="card-text">${courses.selected.description}</p>
       <h6 class="card-title mt-2">Credits:</h6>
-      <p class="card-text">${browseCoursesPage.courses.selected.credits}</p>
+      <p class="card-text">${courses.selected.credits}</p>
       <c:if test="${userState != null}">
         <form action="${pageContext.request.contextPath}/browser/addToCart" method="POST">
           <button type="submit" class="btn btn-primary">Add to Cart</button>

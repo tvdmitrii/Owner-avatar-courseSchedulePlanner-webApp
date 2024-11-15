@@ -13,7 +13,7 @@
     </head>
     <body class="d-flex">
         <c:import url="/templates/header.jsp"/>
-        <c:set var="page" scope="request" value="${viewCartPage}"/>
+        <c:set var="courses" scope="request" value="${viewCartPage.courses}"/>
         <c:set var="detailsServlet" scope="request" value="cart/select"/>
         <c:set var="courseListTitle" scope="request" value="Cart"/>
         <c:set var="courseListEmptyText" scope="request" value="No Courses."/>

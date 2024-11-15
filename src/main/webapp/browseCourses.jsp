@@ -13,7 +13,8 @@
     </head>
     <body class="d-flex">
         <c:import url="/templates/header.jsp"/>
-        <c:set var="page" scope="request" value="${browseCoursesPage}"/>
+        <c:set var="courses" scope="request" value="${browseCoursesPage.courses}"/>
+        <c:set var="departments" scope="request" value="${browseCoursesPage.departments}"/>
         <c:set var="detailsServlet" scope="request" value="browser/select"/>
         <c:set var="courseListTitle" scope="request" value="Results"/>
         <c:set var="courseListEmptyText" scope="request" value="No Results."/>
@@ -25,8 +26,8 @@
                 <c:import url="/templates/courseList.jsp"/>
             </div>
             <div id="course-description-section" class="card d-flex my-3 me-3 p-3">
-                <c:import url="/templates/admin/courseEdit.jsp"/>
-                <%--<c:import url="/templates/courseInfo.jsp"/>--%>
+                <%--<c:import url="/templates/admin/courseEdit.jsp"/>--%>
+                <c:import url="/templates/courseInfo.jsp"/>
             </div>
         </main>
         <c:import url="/templates/footer.jsp"/>

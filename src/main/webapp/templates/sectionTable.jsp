@@ -25,9 +25,9 @@
                                             ${entry.value.isSelected ? "checked" : ""}>
                                     </div>
                                 </td>
-                                <td>${entry.value.daysOfTheWeek}</td>
-                                <td>${entry.value.meetingTimes}</td>
-                                <td>${entry.value.instructor}</td>
+                                <td>${entry.value.daysOfWeek}</td>
+                                <td>${entry.value.meetingTime}</td>
+                                <td>${entry.value.instructor.name}</td>
                             </tr>
                         </c:forEach>
                         </tbody>
@@ -38,7 +38,7 @@
             </form>
         </div>
     </c:when>
-    <c:when test="${viewCartPage.courses.hasSelected}">
+    <c:when test="${courses.hasSelected}">
         <div class="card-body d-flex flex-column ">
             <div class="d-flex flex-grow-1 justify-content-center">
                 <h4 class="card-title mt-1 d-flex align-self-center">There Are No Sections.</h4>
