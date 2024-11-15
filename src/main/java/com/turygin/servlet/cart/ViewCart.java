@@ -12,6 +12,7 @@ import com.turygin.states.ViewCartPageState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 
 
@@ -54,7 +55,7 @@ public class ViewCart extends HttpServlet {
         // Fetch cart course info from API
         Response coursesResponse = client.cartGetCourses(user.getUserId());
         if (RestClient.isStatusSuccess(coursesResponse)) {
-            List<CourseWithSectionsDTO> courses = RestClient.getDTOList(coursesResponse, CourseWithSectionsDTO.class);
+            List<CourseWithSectionsDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
             pageState.setCourses(courses);
         } else {
             request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));

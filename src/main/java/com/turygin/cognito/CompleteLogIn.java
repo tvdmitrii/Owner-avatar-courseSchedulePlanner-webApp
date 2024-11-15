@@ -172,7 +172,7 @@ public class CompleteLogIn extends HttpServlet {
     private void populateUserFromDatabase(UserState userState, RestClient restClient) {
         Response userResponse = restClient.createUserIfNotExists(userState.getCognitoUuid().toString());
         if (RestClient.isStatusSuccess(userResponse)) {
-            UserDTO userDto = RestClient.getDTO(userResponse, UserDTO.class);
+            UserDTO userDto = userResponse.readEntity(UserDTO.class);
             userState.setIsAdmin(userDto.isAdmin());
             userState.setIsNew(userDto.isNewUser());
             userState.setUserId(userDto.getId());

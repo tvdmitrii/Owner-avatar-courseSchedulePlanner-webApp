@@ -1,5 +1,6 @@
 package com.turygin.api.client;
 
+import com.turygin.api.model.DepartmentDTO;
 import com.turygin.api.model.ErrorDTO;
 import com.turygin.api.resource.ICartResource;
 import com.turygin.api.resource.IUserResource;
@@ -52,33 +53,6 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
      */
     public static boolean isStatusSuccess(Response response) {
         return response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL);
-    }
-
-    /**
-     * Reads a DTO entity from response and closes the response.
-     * @param response REST API response
-     * @param entityType entity class type
-     * @return DTO entity
-     * @param <T> the DTO entity type
-     */
-    public static <T> T getDTO(Response response, Class<T> entityType) {
-        T entity = response.readEntity(entityType);
-        response.close();
-        return entity;
-    }
-
-    /**
-     * Reads a list of DTO entities from response and closes the response.
-     * @param response REST API response
-     * @param entityType entity class type
-     * @return DTO entity list
-     * @param <T> the DTO entity type
-     */
-    public static <T> List<T> getDTOList(Response response, Class<T> entityType) {
-        GenericType<List<T>> listType = new GenericType<List<T>>(entityType) {};
-        List<T> entityList = response.readEntity(listType);
-        response.close();
-        return entityList;
     }
 
     /**

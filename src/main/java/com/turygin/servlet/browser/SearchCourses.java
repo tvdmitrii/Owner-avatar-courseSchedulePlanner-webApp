@@ -4,6 +4,7 @@ import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseDTO;
 import com.turygin.states.BrowseCoursesPageState;
 import com.turygin.states.nav.NavigationState;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,10 +78,11 @@ public class SearchCourses extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Search for courses using API
-        Response coursesResponse = client.findCourses(pageState.getTitleSearchTerm(),
-                pageState.getDepartments().getSelected().getId());
+        long departmentId = pageState.getDepartments().getHasSelected()
+                ? pageState.getDepartments().getSelected().getId() : -1;
+        Response coursesResponse = client.findCourses(pageState.getTitleSearchTerm(), departmentId);
         if (RestClient.isStatusSuccess(coursesResponse)) {
-            List<CourseDTO> courses = RestClient.getDTOList(coursesResponse, CourseDTO.class);
+            List<CourseDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
             pageState.setCourses(courses);
             LOG.debug("Found {} courses.", courses.size());
         } else {

@@ -58,7 +58,7 @@ public class EditCourse extends HttpServlet {
         Response courseResponse = client.
                 cartUpdateSections(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds);
         if(RestClient.isStatusSuccess(courseResponse)) {
-            CourseWithSectionsDTO updatedCourse = RestClient.getDTO(courseResponse, CourseWithSectionsDTO.class);
+            CourseWithSectionsDTO updatedCourse = courseResponse.readEntity(CourseWithSectionsDTO.class);
             pageState.getCourses().updateSelected(updatedCourse);
             request.setAttribute("success", String.format("Section selection for %s has been updated.",
                     updatedCourse.getCode()));

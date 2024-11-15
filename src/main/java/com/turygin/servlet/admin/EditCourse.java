@@ -88,7 +88,7 @@ public class EditCourse extends HttpServlet {
 
                 Response addCourseResponse = client.addCourse(submittedCourse);
                 if (RestClient.isStatusSuccess(addCourseResponse)) {
-                    CourseDTO newCourse = RestClient.getDTO(addCourseResponse, CourseDTO.class);
+                    CourseDTO newCourse = addCourseResponse.readEntity(CourseDTO.class);
                     pageState.getCourses().getItems().add(newCourse);
                     request.setAttribute("success", String.format("%s course has been added.",
                             newCourse.getCode()));
@@ -131,7 +131,7 @@ public class EditCourse extends HttpServlet {
 
                 Response updateResponse = client.updateCourse(submittedCourse);
                 if (RestClient.isStatusSuccess(updateResponse)) {
-                    CourseDTO updatedCourse = RestClient.getDTO(updateResponse, CourseDTO.class);
+                    CourseDTO updatedCourse = updateResponse.readEntity(CourseDTO.class);
                     pageState.getCourses().updateSelected(updatedCourse);
                     request.setAttribute("success", String.format("%s course has been updated.",
                             updatedCourse.getCode()));

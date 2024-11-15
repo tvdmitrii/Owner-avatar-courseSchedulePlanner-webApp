@@ -12,7 +12,10 @@ import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -23,6 +26,8 @@ import jakarta.ws.rs.core.Response;
         urlPatterns = { "", "/browser/load" }
 )
 public class LoadCourses extends HttpServlet {
+
+    protected static final Logger LOG = LogManager.getLogger(LoadCourses.class);
 
     /** Empty constructor. */
     public LoadCourses() {}
@@ -53,7 +58,7 @@ public class LoadCourses extends HttpServlet {
         // Fetch department info from the API
         Response departmentsResponse = client.getAllDepartments();
         if(RestClient.isStatusSuccess(departmentsResponse)){
-            List<DepartmentDTO> departments = RestClient.getDTOList(departmentsResponse, DepartmentDTO.class);
+            List<DepartmentDTO> departments = departmentsResponse.readEntity(new GenericType<>() {});
             pageState.setDepartments(departments);
         } else {
             request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));
@@ -64,7 +69,7 @@ public class LoadCourses extends HttpServlet {
         // Fetch course info from the API
         Response coursesResponse = client.getAllCourses();
         if(RestClient.isStatusSuccess(coursesResponse)){
-            List<CourseDTO> courses = RestClient.getDTOList(coursesResponse, CourseDTO.class);
+            List<CourseDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
             pageState.setCourses(courses);
         } else {
             request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));

@@ -76,7 +76,7 @@ public class AddToCart extends HttpServlet {
             Response cartAddCourseResponse =
                     client.cartAddCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
             if(RestClient.isStatusSuccess(cartAddCourseResponse)) {
-                CourseDTO addedCourse = RestClient.getDTO(cartAddCourseResponse, CourseDTO.class);
+                CourseDTO addedCourse = cartAddCourseResponse.readEntity(CourseDTO.class);
                 request.setAttribute("success", String.format("%s has been added to cart.", addedCourse.getCode()));
             } else {
                 request.setAttribute("error", RestClient.getErrorMessage(cartAddCourseResponse));
