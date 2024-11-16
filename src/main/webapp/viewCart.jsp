@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css"/>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/viewCart.css"/>
         <script src="${pageContext.request.contextPath}/js/bootstrap.bundle.min.js"></script>
+        <c:import url="/templates/toastTriggerScript.jsp"/>
         <title>Course Schedule Planner</title>
     </head>
     <body class="d-flex">
@@ -25,6 +26,7 @@
                 <c:import url="/templates/sectionTable.jsp"/>
             </div>
         </main>
+        <c:import url="/templates/toasts.jsp"/>
         <c:import url="/templates/footer.jsp"/>
     </body>
 </html>
