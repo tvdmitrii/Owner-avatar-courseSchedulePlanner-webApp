@@ -1,21 +1,17 @@
 package com.turygin.api.client;
 
-import com.turygin.api.model.DepartmentDTO;
 import com.turygin.api.model.ErrorDTO;
-import com.turygin.api.resource.ICartResource;
-import com.turygin.api.resource.IUserResource;
+import com.turygin.api.model.SectionDTO;
+import com.turygin.api.resource.*;
 import com.turygin.utility.Config;
 import com.turygin.cognito.TokenResponse;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 
 import com.turygin.api.model.CourseDTO;
-import com.turygin.api.resource.ICourseResource;
-import com.turygin.api.resource.IDepartmentResource;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +23,8 @@ import java.util.Properties;
 /**
  * REST API client implementation.
  */
-public class RestClient implements ICourseResource, IDepartmentResource, IUserResource, ICartResource {
+public class RestClient implements
+        ICourseResource, IDepartmentResource, IUserResource, ICartResource, ISectionResource, IInstructorResource {
 
     /** Base API url. */
     private final String baseUrl;
@@ -96,6 +93,14 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
      */
     private String getUserUrl() {
         return String.format("%s/%s", baseUrl, "user");
+    }
+
+    private String getSectionUrl() {
+        return String.format("%s/%s", baseUrl, "section");
+    }
+
+    private String getInstructorUrl() {
+        return String.format("%s/%s", baseUrl, "instructor");
     }
 
     /**
@@ -269,5 +274,28 @@ public class RestClient implements ICourseResource, IDepartmentResource, IUserRe
         return client.target(getCartUrl() + "/{userId}/course/{courseId}").
                 resolveTemplate("userId", userId).resolveTemplate("courseId", courseId).
                 request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionIds, MediaType.APPLICATION_JSON));
+    }
+
+    public Response getAllCourseSections(long courseId) {
+        return client.target(getSectionUrl()).path(String.valueOf(courseId)).request(MediaType.APPLICATION_JSON).get();
+    }
+
+    public Response deleteSection(long sectionId) {
+        return client.target(getSectionUrl()).path(String.valueOf(sectionId)).
+                request(MediaType.APPLICATION_JSON).delete();
+    }
+
+    public Response addSection(long courseId, SectionDTO sectionDTO) {
+        return client.target(getSectionUrl()).path(String.valueOf(courseId)).
+                request(MediaType.APPLICATION_JSON).post(Entity.entity(sectionDTO, MediaType.APPLICATION_JSON));
+    }
+
+    public Response updateSection(SectionDTO sectionDTO) {
+        return client.target(getSectionUrl()).
+                request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionDTO, MediaType.APPLICATION_JSON));
+    }
+
+    public Response getAllInstructors() {
+        return client.target(getInstructorUrl()).request(MediaType.APPLICATION_JSON).get();
     }
 }
