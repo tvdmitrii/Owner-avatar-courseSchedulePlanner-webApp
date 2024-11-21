@@ -14,15 +14,17 @@
                         <a class="nav-link ${navState.name == 'browser' ? "active" : ""}"
                            href="${pageContext.request.contextPath}/browser/load">Browse</a>
                     </li>
-                    <c:if test="${userState != null}">
-                        <li class="nav-item">
-                            <a class="nav-link ${navState.name == 'cart' ? "active" : ""}"
-                               href="${pageContext.request.contextPath}/cart/view">My Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">My Schedules</a>
-                        </li>
-                    </c:if>
+                    <li class="nav-item">
+                        <a class="nav-link ${navState.name == 'cart' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/cart/view">My Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">My Schedules</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ${navState.name == 'admin' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/admin/load">Edit Courses</a>
+                    </li>
                 </ul>
                 <span class="flex-grow-1"></span>
                 <c:choose>

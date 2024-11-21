@@ -11,13 +11,13 @@ import java.util.List;
 public class BrowseCoursesPageState {
 
     /** List of available courses. */
-    private final SelectableList<CourseDTO> courses = new SelectableList<>();
+    protected final SelectableList<CourseDTO> courses = new SelectableList<>();
 
     /** List of available departments. */
-    private final SelectableList<DepartmentDTO> departments = new SelectableList<>();
+    protected final SelectableList<DepartmentDTO> departments = new SelectableList<>();
 
     /** Current title search term for course search. */
-    private String titleSearchTerm;
+    protected String titleSearchTerm;
 
     /**
      * Checks whether title search term is set.

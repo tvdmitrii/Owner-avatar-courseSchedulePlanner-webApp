@@ -1,29 +1,31 @@
-package com.turygin.servlet.browser;
+package com.turygin.servlet.admin;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseDTO;
 import com.turygin.api.model.DepartmentDTO;
-import com.turygin.states.BrowseCoursesPageState;
-
-import java.io.*;
-import java.util.List;
-
+import com.turygin.api.model.InstructorDTO;
+import com.turygin.states.EditCoursesPageState;
 import com.turygin.states.nav.NavigationState;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.util.List;
 
-/**
- * Loads information for course browser page included courses and departments from REST API.
- */
+
 @WebServlet(
-        name = "LoadCourses",
-        urlPatterns = { "", "/browser/load" }
+        name = "AdminLoadCourses",
+        urlPatterns = { "/admin/load" }
 )
 public class LoadCourses extends HttpServlet {
 
@@ -45,11 +47,11 @@ public class LoadCourses extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.BROWSER;
+        NavigationState navState = NavigationState.ADMIN;
         session.setAttribute("navState", navState);
 
         // Initialize page state
-        BrowseCoursesPageState pageState = new BrowseCoursesPageState();
+        EditCoursesPageState pageState = new EditCoursesPageState();
 
         // Fetch REST API client from the context
         ServletContext context = getServletContext();
@@ -77,8 +79,19 @@ public class LoadCourses extends HttpServlet {
             return;
         }
 
+        // Fetch instructor info from the API
+        Response instructorsResponse = client.getAllInstructors();
+        if(RestClient.isStatusSuccess(instructorsResponse)){
+            List<InstructorDTO> instructors = instructorsResponse.readEntity(new GenericType<>() {});
+            pageState.setInstructors(instructors);
+        } else {
+            request.setAttribute("error", RestClient.getErrorMessage(instructorsResponse));
+            forwardToJsp(request, response, navState);
+            return;
+        }
+
         // Save page state in session
-        session.setAttribute("browseCoursesPage", pageState);
+        session.setAttribute("editCoursesPage", pageState);
 
         forwardToJsp(request, response, navState);
     }

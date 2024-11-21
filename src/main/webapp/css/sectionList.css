@@ -1,4 +1,4 @@
-#section-table-card-body {
+#section-list-card-body {
     display: flex;
     flex-flow: column nowrap;
     align-content: stretch;
@@ -6,6 +6,11 @@
     flex: 1 1 1px;
 }
 
-#section-table {
+#section-list ul {
+    flex: 1 1 1px;
+}
+
+#section-list {
     display: flex;
+    flex: 1 1 1px;
 }

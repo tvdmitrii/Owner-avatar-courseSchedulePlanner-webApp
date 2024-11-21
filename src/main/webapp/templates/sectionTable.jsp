@@ -2,7 +2,7 @@
 <h5 class="card-header">Course Sections</h5>
 <c:choose>
     <c:when test="${viewCartPage.hasSections}">
-        <div id="section-list-card-body" class="card-body">
+        <div id="section-table-card-body" class="card-body">
             <form action="${pageContext.request.contextPath}/cart/edit" method="POST">
                 <div id="section-table" class="overflow-auto">
                     <table class="table table-striped">
