@@ -3,7 +3,7 @@ package com.turygin.servlet.admin;
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseDTO;
 import com.turygin.states.BrowseCoursesPageState;
-import com.turygin.states.UserState;
+import com.turygin.states.EditCoursesPageState;
 import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -66,11 +66,11 @@ public class EditCourse extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.BROWSER;
+        NavigationState navState = NavigationState.ADMIN;
         session.setAttribute("navState", navState);
 
         // Get page state
-        BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
+        EditCoursesPageState pageState = (EditCoursesPageState) session.getAttribute("editCoursesPage");
 
         try {
             String action = request.getParameter("action");
@@ -79,9 +79,8 @@ public class EditCourse extends HttpServlet {
             // Fetch REST API client from the context
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
-            UserState user = (UserState) session.getAttribute("userState");
 
-            // Add course and reload course list
+            // Add course
             if (action.equals("add")) {
                 LOG.debug("Adding course.");
                 CourseDTO submittedCourse = processFormParameters(pageState, request);
