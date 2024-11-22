@@ -17,6 +17,14 @@ public class AdminFilter implements Filter {
 
     private static final Logger LOG = LogManager.getLogger(AdminFilter.class);
 
+    private ServletContext context;
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Obtain the ServletContext from FilterConfig
+        context = filterConfig.getServletContext();
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -27,6 +35,7 @@ public class AdminFilter implements Filter {
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null || !user.getIsAdmin()) {
             LOG.debug("Not logged in or not an admin, redirecting to home.");
+            context.setAttribute("authError", "You must be an administrator to access this page!");
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.sendRedirect(String.format("%s/%s", httpRequest.getContextPath(), NavigationState.HOME));
         } else {

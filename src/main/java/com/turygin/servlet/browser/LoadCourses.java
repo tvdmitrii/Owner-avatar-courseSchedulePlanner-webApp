@@ -55,6 +55,13 @@ public class LoadCourses extends HttpServlet {
         ServletContext context = getServletContext();
         RestClient client = (RestClient) context.getAttribute("restClient");
 
+        // This is a home page, check for authentication error
+        String authError = (String) context.getAttribute("authError");
+        if (authError != null && !authError.isEmpty()) {
+            context.removeAttribute("authError");
+            request.setAttribute("error", authError);
+        }
+
         // Fetch department info from the API
         Response departmentsResponse = client.getAllDepartments();
         if(RestClient.isStatusSuccess(departmentsResponse)){

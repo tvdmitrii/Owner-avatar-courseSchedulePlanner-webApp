@@ -17,6 +17,14 @@ public class LoggedInFilter implements Filter {
 
     private static final Logger LOG = LogManager.getLogger(LoggedInFilter.class);
 
+    private ServletContext context;
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // Obtain the ServletContext from FilterConfig
+        context = filterConfig.getServletContext();
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -27,6 +35,7 @@ public class LoggedInFilter implements Filter {
         UserState user = (UserState) session.getAttribute("userState");
         if (user == null) {
             LOG.debug("Not logged in, redirecting to home.");
+            context.setAttribute("authError", "Please login first!");
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.sendRedirect(String.format("%s/%s", httpRequest.getContextPath(), NavigationState.HOME));
         } else {
