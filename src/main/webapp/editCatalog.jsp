@@ -25,7 +25,7 @@
         <c:set var="sectionListEmptyText" scope="request" value="No Sections."/>
         <main class="d-flex">
             <div id="course-search-section" class="card d-flex my-3 ms-3 p-3">
-                <c:import url="/templates/courseSearch.jsp"/>
+                <c:import url="/templates/catalog/courseSearch.jsp"/>
             </div>
             <div id="course-list-section" class="card d-flex my-3 p-3">
                 <c:import url="/templates/courseList.jsp"/>

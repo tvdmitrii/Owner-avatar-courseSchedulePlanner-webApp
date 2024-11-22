@@ -14,7 +14,7 @@
       <select class="form-select" id="course-department-input" name="departmentListId" required>
         <%-- Default Option--%>
         <option
-          ${!departments.hasSelected ? "selected" : ""}
+          ${!courses.hasSelected ? "selected" : ""}
           value="-1"
         >
           Select Department

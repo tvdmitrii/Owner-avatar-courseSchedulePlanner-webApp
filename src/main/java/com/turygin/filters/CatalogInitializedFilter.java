@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/catalog/course", "/catalog/section", "/catalog/new", "/catalog/select"})
+@WebFilter(urlPatterns = {"/catalog/course", "/catalog/section", "/catalog/new", "/catalog/select", "/catalog/search"})
 public class CatalogInitializedFilter implements Filter {
 
     private static final Logger LOG = LogManager.getLogger(CatalogInitializedFilter.class);
