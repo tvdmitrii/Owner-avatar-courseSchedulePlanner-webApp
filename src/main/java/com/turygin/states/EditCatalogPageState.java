@@ -5,7 +5,7 @@ import com.turygin.api.model.SectionDTO;
 
 import java.util.List;
 
-public class EditCoursesPageState extends BrowseCoursesPageState {
+public class EditCatalogPageState extends BrowseCoursesPageState {
     /** List of available sections for selected course. */
     protected final SelectableList<SectionDTO> sections = new SelectableList<>();
 

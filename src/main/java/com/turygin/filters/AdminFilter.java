@@ -12,10 +12,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/cart/*"})
-public class LoggedInFilter implements Filter {
+@WebFilter(urlPatterns = {"/catalog/*"})
+public class AdminFilter implements Filter {
 
-    private static final Logger LOG = LogManager.getLogger(LoggedInFilter.class);
+    private static final Logger LOG = LogManager.getLogger(AdminFilter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -25,8 +25,8 @@ public class LoggedInFilter implements Filter {
         HttpSession session = httpRequest.getSession();
 
         UserState user = (UserState) session.getAttribute("userState");
-        if (user == null) {
-            LOG.debug("Not logged in, redirecting to home.");
+        if (user == null || !user.getIsAdmin()) {
+            LOG.debug("Not logged in or not an admin, redirecting to home.");
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             httpResponse.sendRedirect(String.format("%s/%s", httpRequest.getContextPath(), NavigationState.HOME));
         } else {

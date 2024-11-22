@@ -7,8 +7,8 @@ public class NavigationState {
             new NavigationState("browser", "browser/load", "/browseCourses.jsp");
     public final static NavigationState CART =
             new NavigationState("cart", "cart/view", "/viewCart.jsp");
-    public final static NavigationState ADMIN =
-            new NavigationState("admin", "admin/load", "/editCourses.jsp");
+    public final static NavigationState CATALOG =
+            new NavigationState("catalog", "catalog", "/editCatalog.jsp");
 
     private String name;
     private String defaultServlet;

@@ -1,10 +1,10 @@
-package com.turygin.servlet.admin;
+package com.turygin.servlet.catalog;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseDTO;
 import com.turygin.api.model.DepartmentDTO;
 import com.turygin.api.model.InstructorDTO;
-import com.turygin.states.EditCoursesPageState;
+import com.turygin.states.EditCatalogPageState;
 import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -23,16 +23,19 @@ import java.io.IOException;
 import java.util.List;
 
 
+/**
+ * Loads information about departments, instructors, courses, and associated sections from REST API.
+ */
 @WebServlet(
-        name = "AdminLoadCourses",
-        urlPatterns = { "/admin/load" }
+        name = "CatalogLoadCourses",
+        urlPatterns = { "/catalog" }
 )
-public class LoadCourses extends HttpServlet {
+public class LoadCatalog extends HttpServlet {
 
-    protected static final Logger LOG = LogManager.getLogger(LoadCourses.class);
+    protected static final Logger LOG = LogManager.getLogger(LoadCatalog.class);
 
     /** Empty constructor. */
-    public LoadCourses() {}
+    public LoadCatalog() {}
 
     /**
      * Handles HTTP GET requests.
@@ -47,11 +50,11 @@ public class LoadCourses extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.ADMIN;
+        NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
         // Initialize page state
-        EditCoursesPageState pageState = new EditCoursesPageState();
+        EditCatalogPageState pageState = new EditCatalogPageState();
 
         // Fetch REST API client from the context
         ServletContext context = getServletContext();
@@ -91,7 +94,7 @@ public class LoadCourses extends HttpServlet {
         }
 
         // Save page state in session
-        session.setAttribute("editCoursesPage", pageState);
+        session.setAttribute("editCatalogPage", pageState);
 
         forwardToJsp(request, response, navState);
     }

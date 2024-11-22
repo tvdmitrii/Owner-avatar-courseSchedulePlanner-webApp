@@ -1,9 +1,9 @@
-package com.turygin.servlet.admin;
+package com.turygin.servlet.catalog;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.CourseDTO;
 import com.turygin.states.BrowseCoursesPageState;
-import com.turygin.states.EditCoursesPageState;
+import com.turygin.states.EditCatalogPageState;
 import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -21,18 +21,18 @@ import java.io.IOException;
 
 
 /**
- * Administrator servlet for adding, updating, or removing a course.
+ * Servlet for adding, updating, or removing a course.
  */
 @WebServlet(
-        name = "AdminEditCourse",
-        urlPatterns = { "/admin/course/edit" }
+        name = "CatalogEditCourse",
+        urlPatterns = { "/catalog/course" }
 )
-public class EditCourse extends HttpServlet {
+public class ModifyCourse extends HttpServlet {
 
-    private static final Logger LOG = LogManager.getLogger(EditCourse.class);
+    private static final Logger LOG = LogManager.getLogger(ModifyCourse.class);
 
     /** Empty constructor. */
-    public EditCourse() {}
+    public ModifyCourse() {}
 
     /**
      * Constructs course DTO object from form parameters.
@@ -66,11 +66,11 @@ public class EditCourse extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.ADMIN;
+        NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
         // Get page state
-        EditCoursesPageState pageState = (EditCoursesPageState) session.getAttribute("editCoursesPage");
+        EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
             String action = request.getParameter("action");

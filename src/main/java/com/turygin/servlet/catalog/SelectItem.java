@@ -1,9 +1,8 @@
-package com.turygin.servlet.admin;
+package com.turygin.servlet.catalog;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.SectionDTO;
-import com.turygin.states.BrowseCoursesPageState;
-import com.turygin.states.EditCoursesPageState;
+import com.turygin.states.EditCatalogPageState;
 import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -22,11 +21,11 @@ import java.util.List;
 
 
 /**
- * Selects a course from a course list on the course browser page.
+ * Selects a course or section that the user wants to edit and populates the editing section.
  */
 @WebServlet(
-        name = "AdminSelectItem",
-        urlPatterns = { "/admin/select" }
+        name = "CatalogSelectItem",
+        urlPatterns = { "/catalog/select" }
 )
 public class SelectItem extends HttpServlet {
 
@@ -46,11 +45,11 @@ public class SelectItem extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.ADMIN;
+        NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
         // Get page state
-        EditCoursesPageState pageState = (EditCoursesPageState) session.getAttribute("editCoursesPage");
+        EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
             // Fetch REST API client from the context

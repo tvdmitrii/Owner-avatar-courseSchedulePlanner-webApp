@@ -1,10 +1,10 @@
-package com.turygin.servlet.admin;
+package com.turygin.servlet.catalog;
 
 import com.turygin.api.client.RestClient;
 import com.turygin.api.model.DaysOfWeekDTO;
 import com.turygin.api.model.MeetingTimeDTO;
 import com.turygin.api.model.SectionDTO;
-import com.turygin.states.EditCoursesPageState;
+import com.turygin.states.EditCatalogPageState;
 import com.turygin.states.nav.NavigationState;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -22,18 +22,18 @@ import java.io.IOException;
 
 
 /**
- * Administrator servlet for adding, updating, or removing a section.
+ * Servlet for adding, updating, or removing a section.
  */
 @WebServlet(
-        name = "AdminEditSection",
-        urlPatterns = { "/admin/section/edit" }
+        name = "CatalogEditSection",
+        urlPatterns = { "/catalog/section" }
 )
-public class EditSection extends HttpServlet {
+public class ModifySection extends HttpServlet {
 
-    private static final Logger LOG = LogManager.getLogger(EditSection.class);
+    private static final Logger LOG = LogManager.getLogger(ModifySection.class);
 
     /** Empty constructor. */
-    public EditSection() {}
+    public ModifySection() {}
 
     /**
      * Constructs section DTO object from form parameters.
@@ -41,7 +41,7 @@ public class EditSection extends HttpServlet {
      * @param request user request containing form parameters
      * @return section DTO
      */
-    private SectionDTO processFormParameters(EditCoursesPageState pageState, HttpServletRequest request) {
+    private SectionDTO processFormParameters(EditCatalogPageState pageState, HttpServletRequest request) {
         SectionDTO submittedSection = new SectionDTO();
 
         // Parse days of week
@@ -70,6 +70,7 @@ public class EditSection extends HttpServlet {
         endTime.setPastNoon(Boolean.parseBoolean(request.getParameter("endTimeMeridian")));
         submittedSection.setEndTime(endTime);
 
+        // Select instructor
         int instructorListId = Integer.parseInt(request.getParameter("instructorListId"));
         submittedSection.setInstructor(pageState.getInstructors().getItems().get(instructorListId));
 
@@ -89,11 +90,11 @@ public class EditSection extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Set navigation state
-        NavigationState navState = NavigationState.ADMIN;
+        NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
         // Get page state
-        EditCoursesPageState pageState = (EditCoursesPageState) session.getAttribute("editCoursesPage");
+        EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
             String action = request.getParameter("action");
@@ -134,7 +135,7 @@ public class EditSection extends HttpServlet {
 
             // Delete section
             if (action.equals("delete")) {
-                Response removeResponse = client.deleteSection(pageState.getCourses().getSelected().getId());
+                Response removeResponse = client.deleteSection(pageState.getSections().getSelected().getId());
                 if (RestClient.isStatusSuccess(removeResponse)) {
                     pageState.getSections().removeSelected();
                     request.setAttribute("success", "Section has been removed.");

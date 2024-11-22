@@ -5,10 +5,12 @@
     </div>
     <nav id="header-nav" class="d-flex navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <%-- Page Navigation Section--%>
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link ${navState.name == 'browser' ? "active" : ""}"
@@ -22,11 +24,12 @@
                         <a class="nav-link" href="#">My Schedules</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link ${navState.name == 'admin' ? "active" : ""}"
-                           href="${pageContext.request.contextPath}/admin/load">Edit Courses</a>
+                        <a class="nav-link ${navState.name == 'catalog' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/catalog">Edit Catalog</a>
                     </li>
                 </ul>
                 <span class="flex-grow-1"></span>
+                <%-- Account Section--%>
                 <c:choose>
                     <c:when test="${userState == null}">
                         <ul class="navbar-nav">
