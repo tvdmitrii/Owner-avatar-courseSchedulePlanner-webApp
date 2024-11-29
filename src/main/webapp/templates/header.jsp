@@ -21,7 +21,8 @@
                            href="${pageContext.request.contextPath}/cart/view">My Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">My Schedules</a>
+                        <a class="nav-link ${navState.name == 'schedule' ? "active" : ""}"
+                           href="${pageContext.request.contextPath}/schedule">My Schedules</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link ${navState.name == 'catalog' ? "active" : ""}"

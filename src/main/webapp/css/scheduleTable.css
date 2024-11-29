@@ -1,0 +1,9 @@
+.schedule-block {
+    position: absolute;
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    text-align: center;
+    border-radius: 0.25rem;
+    width: calc(100% / 6);
+}

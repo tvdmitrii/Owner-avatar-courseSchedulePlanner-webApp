@@ -103,4 +103,8 @@ public class SelectableList<T> {
     public void resetSelected() {
         selectedId = -1;
     }
+
+    public int getSize() {
+        return items != null ? items.size() : 0;
+    }
 }

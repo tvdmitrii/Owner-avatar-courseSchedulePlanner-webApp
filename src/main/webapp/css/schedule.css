@@ -1,0 +1,5 @@
+@import url("scheduleTable.css");
+
+#schedule-table-section {
+    flex: 1 1 0;
+}

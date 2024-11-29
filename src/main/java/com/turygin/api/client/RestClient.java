@@ -24,7 +24,8 @@ import java.util.Properties;
  * REST API client implementation.
  */
 public class RestClient implements
-        ICourseResource, IDepartmentResource, IUserResource, ICartResource, ISectionResource, IInstructorResource {
+        ICourseResource, IDepartmentResource, IUserResource, ICartResource,
+        ISectionResource, IInstructorResource, IScheduleResource {
 
     /** Base API url. */
     private final String baseUrl;
@@ -101,6 +102,10 @@ public class RestClient implements
 
     private String getInstructorUrl() {
         return String.format("%s/%s", baseUrl, "instructor");
+    }
+
+    private String getScheduleUrl() {
+        return String.format("%s/%s", baseUrl, "schedule");
     }
 
     /**
@@ -297,5 +302,9 @@ public class RestClient implements
 
     public Response getAllInstructors() {
         return client.target(getInstructorUrl()).request(MediaType.APPLICATION_JSON).get();
+    }
+
+    public Response getSchedules(long userId) {
+        return client.target(getScheduleUrl()).path(String.valueOf(userId)).request(MediaType.APPLICATION_JSON).get();
     }
 }

@@ -9,6 +9,8 @@ public class NavigationState {
             new NavigationState("cart", "cart/view", "/viewCart.jsp");
     public final static NavigationState CATALOG =
             new NavigationState("catalog", "catalog", "/editCatalog.jsp");
+    public final static NavigationState SCHEDULE =
+            new NavigationState("schedule", "schedule", "/schedule.jsp");
 
     private String name;
     private String defaultServlet;
