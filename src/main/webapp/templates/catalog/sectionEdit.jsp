@@ -103,7 +103,7 @@
         <%-- PM Option --%>
         <option
           ${sections.hasSelected && sections.selected.startTime.pastNoon ? "selected" : ""}
-          value="false"
+          value="true"
         >
           PM
         </option>
@@ -154,7 +154,7 @@
         <%-- PM Option --%>
         <option
           ${sections.hasSelected && sections.selected.endTime.pastNoon ? "selected" : ""}
-          value="false"
+          value="true"
         >
           PM
         </option>
