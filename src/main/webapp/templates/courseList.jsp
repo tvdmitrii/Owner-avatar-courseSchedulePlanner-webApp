@@ -5,10 +5,12 @@
         <div id="course-list-card-body" class="card-body">
             <div id="course-list" class="overflow-auto">
                 <ul class="list-group align-content-stretch">
+                    <%-- Display all courses available. --%>
                     <c:forEach var="course" items="${courses.items}" varStatus="loop">
                         <a href="${pageContext.request.contextPath}/${detailsServlet}?courseListId=${loop.index}"
-                           class="list-group-item ${courses.hasSelected
-                                                && course.id == courses.selected.id ? "active" : ""}">
+                           class="list-group-item
+                           ${courses.hasSelected && course.id == courses.selected.id ? "active" : ""}"
+                        >
                                 ${course.code}: ${course.title}
                         </a>
                     </c:forEach>

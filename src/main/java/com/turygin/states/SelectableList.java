@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper class that represents a list that can remember a selected item in that list.
+ * Helper class that represents a list that can remember a selected item in that list and interact with that item.
  * @param <T> the type of elements stored in the list
  */
 public class SelectableList<T> {
 
     /** Underlying item list storage. */
-    private List<T> items = new ArrayList<>();
+    private final List<T> items = new ArrayList<>();
 
     /** Selected element ID. */
     private int selectedId = -1;
@@ -28,7 +28,10 @@ public class SelectableList<T> {
      * @param items the loaded items
      */
     public void setItems(List<T> items) {
-        this.items = items;
+        this.items.clear();
+        if (items != null) {
+            this.items.addAll(items);
+        }
         resetSelected();
     }
 
@@ -53,7 +56,7 @@ public class SelectableList<T> {
      * @return true if there are items in the list, false otherwise
      */
     public boolean getHasItems() {
-        return items != null && !items.isEmpty();
+        return !items.isEmpty();
     }
 
     /**
@@ -105,6 +108,6 @@ public class SelectableList<T> {
     }
 
     public int getSize() {
-        return items != null ? items.size() : 0;
+        return items.size();
     }
 }

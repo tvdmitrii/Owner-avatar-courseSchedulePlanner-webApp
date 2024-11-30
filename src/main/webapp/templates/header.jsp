@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <header class="d-flex flex-wrap justify-content-center border-bottom">
     <div id="header-title" class="d-flex mt-1">
-        <span class="fs-3">Course Schedule Planner. Under Construction.</span>
+        <span class="fs-3">Course Schedule Planner</span>
     </div>
     <nav id="header-nav" class="d-flex navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">

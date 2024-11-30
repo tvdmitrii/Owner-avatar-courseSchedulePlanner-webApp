@@ -5,10 +5,12 @@
         <div id="section-list-card-body" class="card-body">
             <div id="section-list" class="overflow-auto">
                 <ul class="list-group align-content-stretch">
+                    <%-- Display all sections available. --%>
                     <c:forEach var="section" items="${sections.items}" varStatus="loop">
                         <a href="${pageContext.request.contextPath}/${detailsServlet}?sectionListId=${loop.index}"
-                           class="list-group-item ${sections.hasSelected
-                                                && section.id == sections.selected.id ? "active" : ""}">
+                           class="list-group-item
+                           ${sections.hasSelected && section.id == sections.selected.id ? "active" : ""}"
+                        >
                                 Section ${loop.index+1}
                         </a>
                     </c:forEach>

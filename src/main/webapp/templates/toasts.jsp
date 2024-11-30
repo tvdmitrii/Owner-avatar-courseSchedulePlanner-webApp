@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%-- Error toast template. --%>
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
   <div id="error-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
@@ -9,6 +10,7 @@
     </div>
   </div>
 </div>
+<%-- Success toast template. --%>
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
   <div id="success-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">

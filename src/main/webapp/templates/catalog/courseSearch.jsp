@@ -29,16 +29,14 @@
     <%-- Search Form Submit Button --%>
     <button type="submit" class="btn btn-primary">Search</button>
   </form>
-  <%-- Form for Adding a New Course/Section Available for Admins When Using Edit Catalog Page --%>
-  <c:if test="${userState != null && userState.isAdmin}">
-    <form action="${pageContext.request.contextPath}/catalog/new" method="POST">
-      <div class="d-flex justify-content-center">
-        <button type="submit" name="action" value="course" class="btn btn-primary mx-1 d-flex">New Course</button>
-        <%-- Show option to add a section only if a course is selected --%>
-        <c:if test="${courses.hasSelected}">
-          <button type="submit" name="action" value="section" class="btn btn-primary ms-1 d-flex">New Section</button>
-        </c:if>
-      </div>
-    </form>
-  </c:if>
+  <%-- Form for Adding a New Course/Section --%>
+  <form action="${pageContext.request.contextPath}/catalog/new" method="POST">
+    <div class="d-flex justify-content-center">
+      <button type="submit" name="action" value="course" class="btn btn-primary mx-1 d-flex">New Course</button>
+      <%-- Show option to add a section only if a course is selected --%>
+      <c:if test="${courses.hasSelected}">
+        <button type="submit" name="action" value="section" class="btn btn-primary ms-1 d-flex">New Section</button>
+      </c:if>
+    </div>
+  </form>
 </div>
