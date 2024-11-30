@@ -81,9 +81,9 @@
                                          left: ${100.0 / 6 * (loop.index + 1)}%;
                                          top: ${100.0 / 14 * (startTimeFraction - 7 + 1)}%;
                                          height: ${100.0 / 14 * duration}%">
-                                    ${section.course.code}
-                                    ${section.startTime}
-                                    ${section.endTime}
+                                <p class="h6 mb-1">${section.course.code}</p>
+                                <p class="my-0">${section.startTime} - ${section.endTime}</p>
+                                <p class="my-0">${section.instructor.name}</p>
                             </div>
                         </c:if>
                     </c:forEach>
