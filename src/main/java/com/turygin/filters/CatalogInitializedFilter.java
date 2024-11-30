@@ -12,11 +12,23 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * Web filter that ensures that catalog requests first go through the main catalog servlet. This ensures
+ * that the information about courses, sections, instructors, and departments has been initialized.
+ */
 @WebFilter(urlPatterns = {"/catalog/course", "/catalog/section", "/catalog/new", "/catalog/select", "/catalog/search"})
 public class CatalogInitializedFilter implements Filter {
 
     private static final Logger LOG = LogManager.getLogger(CatalogInitializedFilter.class);
 
+    /**
+     * Redirects users to the main catalog servlet if catalog page state has not yet been initialized.
+     * @param request object that contains the client's request information
+     * @param response object used to send the response back to the client
+     * @param chain chain of downstream web filters
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {

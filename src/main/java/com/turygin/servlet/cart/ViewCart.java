@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.Response;
 
 
 /**
- * Loads courses with sections from REST API to display on the cart page.
+ * Main cart servlet. Loads courses with sections from REST API to display on the cart page.
  */
 @WebServlet(
         name = "ViewCart",
@@ -39,6 +39,8 @@ public class ViewCart extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+
+        // Web filter ensures that user has been logged in.
         UserState user = (UserState) session.getAttribute("userState");
 
         // Set navigation state
@@ -53,32 +55,19 @@ public class ViewCart extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Fetch cart course info from API
-        Response coursesResponse = client.cartGetCourses(user.getUserId());
-        if (RestClient.isStatusSuccess(coursesResponse)) {
-            List<CourseWithSectionsDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
-            pageState.setCourses(courses);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.cartGetCourses(user.getUserId())) {
+            if (RestClient.isStatusSuccess(apiResponse)) {
+                List<CourseWithSectionsDTO> courses = apiResponse.readEntity(new GenericType<>() {
+                });
+                pageState.setCourses(courses);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+            }
         }
 
         // Save page state in session
         session.setAttribute("viewCartPage", pageState);
 
-        forwardToJsp(request, response, navState);
-    }
-
-    /**
-     * Helper method that forwards to a JSP.
-     * @param request client request
-     * @param response response object
-     * @param navState navigation state object
-     * @throws ServletException if servlet error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
-            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

@@ -12,19 +12,36 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-@WebFilter(urlPatterns = {"/cart/*"})
+/**
+ * Web filter that limits access to users that are not logged in.
+ */
+@WebFilter(urlPatterns = {"/browser/addToCart", "/cart/*", "/schedule/*"})
 public class LoggedInFilter implements Filter {
 
     private static final Logger LOG = LogManager.getLogger(LoggedInFilter.class);
 
+    /** Servlet context for passing errors upon redirect to other pages. */
     private ServletContext context;
 
+    /**
+     * Save servlet context for later use.
+     * @param filterConfig filter configuration object
+     */
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         // Obtain the ServletContext from FilterConfig
         context = filterConfig.getServletContext();
     }
 
+    /**
+     * Redirects users with that are not logged in to the home page. Sets authError servlet context attribute to
+     * indicate the error.
+     * @param request object that contains the client's request information
+     * @param response object used to send the response back to the client
+     * @param chain chain of downstream web filters
+     * @throws ServletException if servlet error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {

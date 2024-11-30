@@ -39,6 +39,10 @@ public class Config {
         return properties;
     }
 
+    /**
+     * Helper method that constructs Cognito Issuer URL from provided properties.
+     * @return Cognito issuer URL
+     */
     public static String getCognitoIssuerUrl() {
         Properties props = getProperties();
         return String.format(

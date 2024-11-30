@@ -60,7 +60,6 @@ public class RestClient implements
      */
     public static String getErrorMessage(Response response) {
         ErrorDTO error = response.readEntity(ErrorDTO.class);
-        response.close();
         return String.format("Status: %d. Error: %s", error.getStatus(), error.getMessage());
     }
 
@@ -96,14 +95,26 @@ public class RestClient implements
         return String.format("%s/%s", baseUrl, "user");
     }
 
+    /**
+     * Helper method that constructs URL for section endpoints.
+     * @return URL for section endpoints
+     */
     private String getSectionUrl() {
         return String.format("%s/%s", baseUrl, "section");
     }
 
+    /**
+     * Helper method that constructs URL for instructor endpoints.
+     * @return URL for instructor endpoints
+     */
     private String getInstructorUrl() {
         return String.format("%s/%s", baseUrl, "instructor");
     }
 
+    /**
+     * Helper method that constructs URL for schedule endpoints.
+     * @return URL for schedule endpoints
+     */
     private String getScheduleUrl() {
         return String.format("%s/%s", baseUrl, "schedule");
     }
@@ -117,6 +128,7 @@ public class RestClient implements
     {
         Properties webAppProps = Config.getProperties();
 
+        // Put together form parameters
         Form form = new Form();
         form.param("grant_type", "authorization_code");
         form.param("client-secret", webAppProps.getProperty("cognito.client.secret"));
@@ -124,6 +136,7 @@ public class RestClient implements
         form.param("code", authorizationCode);
         form.param("redirect_uri", webAppProps.getProperty("cognito.redirectURL"));
 
+        // Attach authorization headers
         String authHeader = webAppProps.getProperty("cognito.client.id") +
                 ":" + webAppProps.getProperty("cognito.client.secret");
         String authHeaderEncoded = Base64.getEncoder().encodeToString(authHeader.getBytes());
@@ -281,29 +294,59 @@ public class RestClient implements
                 request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionIds, MediaType.APPLICATION_JSON));
     }
 
+    /**
+     * Fetches all sections associated with a course.
+     * @param courseId unique course ID
+     * @return a list of section DTOs
+     */
     public Response getAllCourseSections(long courseId) {
         return client.target(getSectionUrl()).path(String.valueOf(courseId)).request(MediaType.APPLICATION_JSON).get();
     }
 
+    /**
+     * Removes course section from the database.
+     * @param sectionId unique section ID
+     * @return 204 response if section was removed
+     */
     public Response deleteSection(long sectionId) {
         return client.target(getSectionUrl()).path(String.valueOf(sectionId)).
                 request(MediaType.APPLICATION_JSON).delete();
     }
 
+    /**
+     * Adds a new section to a course.
+     * @param courseId unique course ID
+     * @param sectionDTO new section DTO
+     * @return section DTO from the server representing newly created section
+     */
     public Response addSection(long courseId, SectionDTO sectionDTO) {
         return client.target(getSectionUrl()).path(String.valueOf(courseId)).
                 request(MediaType.APPLICATION_JSON).post(Entity.entity(sectionDTO, MediaType.APPLICATION_JSON));
     }
 
+    /**
+     * Updates an existing course section
+     * @param sectionDTO updated section DTO
+     * @return updated section DTO from the server
+     */
     public Response updateSection(SectionDTO sectionDTO) {
         return client.target(getSectionUrl()).
                 request(MediaType.APPLICATION_JSON).put(Entity.entity(sectionDTO, MediaType.APPLICATION_JSON));
     }
 
+    /**
+     * Fetches all available instructors.
+     * @return a list of instructor DTOs
+     */
     public Response getAllInstructors() {
         return client.target(getInstructorUrl()).request(MediaType.APPLICATION_JSON).get();
     }
 
+    /**
+     * Generates and returns all schedules based on user's cart.
+     * @param userId unique user ID
+     * @return a list of schedule DTOs
+     */
     public Response getSchedules(long userId) {
         return client.target(getScheduleUrl()).path(String.valueOf(userId)).request(MediaType.APPLICATION_JSON).get();
     }

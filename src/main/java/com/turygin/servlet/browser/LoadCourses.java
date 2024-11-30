@@ -19,7 +19,8 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * Loads information for course browser page included courses and departments from REST API.
+ * Main servlet for course browsing. Loads information about courses and departments from REST API.
+ * It is also the website home page.
  */
 @WebServlet(
         name = "LoadCourses",
@@ -63,25 +64,27 @@ public class LoadCourses extends HttpServlet {
         }
 
         // Fetch department info from the API
-        Response departmentsResponse = client.getAllDepartments();
-        if(RestClient.isStatusSuccess(departmentsResponse)){
-            List<DepartmentDTO> departments = departmentsResponse.readEntity(new GenericType<>() {});
-            pageState.setDepartments(departments);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.getAllDepartments()) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<DepartmentDTO> departments = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setDepartments(departments);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+                forwardToJsp(request, response, navState);
+                return;
+            }
         }
 
         // Fetch course info from the API
-        Response coursesResponse = client.getAllCourses();
-        if(RestClient.isStatusSuccess(coursesResponse)){
-            List<CourseDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
-            pageState.setCourses(courses);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.getAllCourses()) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<CourseDTO> courses = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setCourses(courses);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+                forwardToJsp(request, response, navState);
+                return;
+            }
         }
 
         // Save page state in session

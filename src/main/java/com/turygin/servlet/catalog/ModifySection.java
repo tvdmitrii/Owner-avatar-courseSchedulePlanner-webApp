@@ -78,7 +78,7 @@ public class ModifySection extends HttpServlet {
     }
 
     /**
-     * Handles HTTP POST requests.
+     * Handles HTTP POST requests which contain section information.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -93,10 +93,11 @@ public class ModifySection extends HttpServlet {
         NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
+            // "action" parameter can be either "add", "delete" or "update"
             String action = request.getParameter("action");
             assert action != null;
 
@@ -109,24 +110,26 @@ public class ModifySection extends HttpServlet {
                 LOG.debug("Adding section.");
                 SectionDTO submittedSection = processFormParameters(pageState, request);
 
-                Response addSectionResponse = client.addSection(pageState.getCourses().getSelected().getId(),
-                        submittedSection);
-                if (RestClient.isStatusSuccess(addSectionResponse)) {
-                    SectionDTO newSection = addSectionResponse.readEntity(SectionDTO.class);
-                    pageState.getSections().getItems().add(newSection);
-                    request.setAttribute("success","Section has been added.");
-                    LOG.debug("Added section: {}", newSection.toString());
-                } else {
-                    String error = RestClient.getErrorMessage(addSectionResponse);
-                    LOG.error(error);
-                    request.setAttribute("error", error);
+                // Send add section request
+                try (Response apiResponse = client.addSection(pageState.getCourses().getSelected().getId(),
+                        submittedSection)) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        SectionDTO newSection = apiResponse.readEntity(SectionDTO.class);
+                        pageState.getSections().getItems().add(newSection);
+                        request.setAttribute("success","Section has been added.");
+                        LOG.debug("Added section: {}", newSection.toString());
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        LOG.error(error);
+                        request.setAttribute("error", error);
+                    }
                 }
 
                 forwardToJsp(request, response, navState);
                 return;
             }
 
-            // If not adding a section, ensure it is selected
+            // If not adding a section, ensure a section is selected
             if (!pageState.getSections().getHasSelected()) {
                 LOG.warn("Section is not selected.");
                 response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
@@ -135,31 +138,35 @@ public class ModifySection extends HttpServlet {
 
             // Delete section
             if (action.equals("delete")) {
-                Response removeResponse = client.deleteSection(pageState.getSections().getSelected().getId());
-                if (RestClient.isStatusSuccess(removeResponse)) {
-                    pageState.getSections().removeSelected();
-                    request.setAttribute("success", "Section has been removed.");
-                    LOG.debug("Removed section.");
-                } else {
-                    String error = RestClient.getErrorMessage(removeResponse);
-                    LOG.error(error);
-                    request.setAttribute("error", error);
+                // Send delete section request
+                try (Response apiResponse = client.deleteSection(pageState.getSections().getSelected().getId())) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        pageState.getSections().removeSelected();
+                        request.setAttribute("success", "Section has been removed.");
+                        LOG.debug("Removed section.");
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        LOG.error(error);
+                        request.setAttribute("error", error);
+                    }
                 }
             } else if (action.equals("update")) {
                 // Update section
                 SectionDTO submittedSection = processFormParameters(pageState, request);
                 submittedSection.setId(pageState.getSections().getSelected().getId());
 
-                Response updateResponse = client.updateSection(submittedSection);
-                if (RestClient.isStatusSuccess(updateResponse)) {
-                    SectionDTO updatedSection = updateResponse.readEntity(SectionDTO.class);
-                    pageState.getSections().updateSelected(updatedSection);
-                    request.setAttribute("success", "Section has been updated.");
-                    LOG.debug("Updated section: {}", updatedSection.toString());
-                } else {
-                    String error = RestClient.getErrorMessage(updateResponse);
-                    request.setAttribute("error", error);
-                    LOG.error(error);
+                // Send update section request
+                try (Response apiResponse = client.updateSection(submittedSection)) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        SectionDTO updatedSection = apiResponse.readEntity(SectionDTO.class);
+                        pageState.getSections().updateSelected(updatedSection);
+                        request.setAttribute("success", "Section has been updated.");
+                        LOG.debug("Updated section: {}", updatedSection.toString());
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        request.setAttribute("error", error);
+                        LOG.error(error);
+                    }
                 }
             } else {
                 LOG.warn("Unknown action: {}.", action);

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Performs a course search via REST API and updates the course list of course browser.
+ * Performs a course search via REST API and updates the course list of course catalog page.
  */
 @WebServlet(
         name = "CatalogSearchCourses",
@@ -53,10 +53,11 @@ public class SearchCourses extends HttpServlet {
         NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
-        // Set search title (if present)
+        // Set search title (if present).
+        // "title" query parameter contains course title substring to search for.
         try {
             String searchTitle = request.getParameter("title");
             pageState.setTitleSearchTerm(searchTitle.trim().toLowerCase());
@@ -66,7 +67,8 @@ public class SearchCourses extends HttpServlet {
             pageState.setTitleSearchTerm(null);
         }
 
-        // Set search department (if present)
+        // Set search department (if present).
+        // "departmentListId" query parameter contains ID of the department in internal department list.
         try {
             int departmentListId = Integer.parseInt(request.getParameter("departmentListId"));
             pageState.getDepartments().setSelectedId(departmentListId);
@@ -80,17 +82,19 @@ public class SearchCourses extends HttpServlet {
         ServletContext context = getServletContext();
         RestClient client = (RestClient) context.getAttribute("restClient");
 
-        // Search for courses using API
+        // Set department database ID to ID of the selected department, or to -1 if none selected.
         long departmentId = pageState.getDepartments().getHasSelected()
                 ? pageState.getDepartments().getSelected().getId() : -1;
-        Response coursesResponse = client.findCourses(pageState.getTitleSearchTerm(), departmentId);
-        if (RestClient.isStatusSuccess(coursesResponse)) {
-            List<CourseDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
-            pageState.setCourses(courses);
-            LOG.debug("Found {} courses.", courses.size());
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
-            forwardToJsp(request, response, navState);
+
+        // Send search request
+        try (Response apiResponse = client.findCourses(pageState.getTitleSearchTerm(), departmentId)) {
+            if (RestClient.isStatusSuccess(apiResponse)) {
+                List<CourseDTO> courses = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setCourses(courses);
+                LOG.debug("Found {} courses.", courses.size());
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+            }
         }
 
         // Reset selected course
@@ -100,19 +104,6 @@ public class SearchCourses extends HttpServlet {
         // Switch to course mode
         pageState.setIsCourseMode(true);
 
-        forwardToJsp(request, response, navState);
-    }
-
-    /**
-     * Helper method that forwards to a JSP.
-     * @param request client request
-     * @param response response object
-     * @param navState navigation state object
-     * @throws ServletException if servlet error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
-            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

@@ -23,7 +23,7 @@ import java.util.List;
 
 
 /**
- * Loads information about departments, instructors, courses, and associated sections from REST API.
+ * Servlet that requests available schedules from REST API based on user's cart.
  */
 @WebServlet(
         name = "LoadSchedules",
@@ -51,7 +51,9 @@ public class LoadSchedules extends HttpServlet {
         // Set navigation state
         NavigationState navState = NavigationState.SCHEDULE;
         session.setAttribute("navState", navState);
-        //UserState user = (UserState) session.getAttribute("userState");
+
+        // Web filter ensures that user has been logged in.
+        UserState user = (UserState) session.getAttribute("userState");
 
         // Initialize page state
         SchedulePageState pageState = new SchedulePageState();
@@ -60,36 +62,22 @@ public class LoadSchedules extends HttpServlet {
         ServletContext context = getServletContext();
         RestClient client = (RestClient) context.getAttribute("restClient");
 
-        // Generate and fetch schedules from the API
-        Response scheduleResponse = client.getSchedules(1);//client.getSchedules(user.getUserId());
-        if(RestClient.isStatusSuccess(scheduleResponse)){
-            List<ScheduleDTO> schedules = scheduleResponse.readEntity(new GenericType<>() {});
-            pageState.setSchedules(schedules);
-            if (!schedules.isEmpty()) {
-                pageState.getSchedules().setSelectedId(0);
+        // Send a request to generate and fetch schedules from the API
+        try (Response apiResponse = client.getSchedules(user.getUserId())) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<ScheduleDTO> schedules = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setSchedules(schedules);
+                if (!schedules.isEmpty()) {
+                    pageState.getSchedules().setSelectedId(0);
+                }
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
             }
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(scheduleResponse));
-            forwardToJsp(request, response, navState);
-            return;
         }
 
         // Save page state in session
         session.setAttribute("schedulePage", pageState);
 
-        forwardToJsp(request, response, navState);
-    }
-
-    /**
-     * Helper method that forwards to a JSP.
-     * @param request client request
-     * @param response response object
-     * @param navState navigation state object
-     * @throws ServletException if servlet error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
-            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

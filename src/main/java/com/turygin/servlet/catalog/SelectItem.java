@@ -21,7 +21,7 @@ import java.util.List;
 
 
 /**
- * Selects a course or section that the user wants to edit and populates the editing section.
+ * Servlet that selects a course or section that the user wants to edit and populates the editing area.
  */
 @WebServlet(
         name = "CatalogSelectItem",
@@ -33,7 +33,7 @@ public class SelectItem extends HttpServlet {
     public SelectItem() {}
 
     /**
-     * Handles HTTP GET requests.
+     * Handles HTTP GET requests that contains either course list ID or section list ID.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -48,7 +48,7 @@ public class SelectItem extends HttpServlet {
         NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
@@ -56,22 +56,21 @@ public class SelectItem extends HttpServlet {
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
 
-            // Select a course from the list if the index is valid ...
             String courseListIdString = request.getParameter("courseListId");
-
             if (courseListIdString != null) {
                 // If selecting a course
                 int courseListId = Integer.parseInt(courseListIdString);
                 pageState.getCourses().setSelectedId(courseListId);
-                Response sectionResponse = client.getAllCourseSections(pageState.getCourses().getSelected().getId());
-                if(RestClient.isStatusSuccess(sectionResponse)) {
-                    List<SectionDTO> sections = sectionResponse.readEntity(new GenericType<>() {});
-                    pageState.setSections(sections);
-                    pageState.setIsCourseMode(true);
-                } else {
-                    request.setAttribute("error", RestClient.getErrorMessage(sectionResponse));
-                    forwardToJsp(request, response, navState);
-                    return;
+
+                // Send a request to load all course sections
+                try (Response apiResponse = client.getAllCourseSections(pageState.getCourses().getSelected().getId())) {
+                    if(RestClient.isStatusSuccess(apiResponse)) {
+                        List<SectionDTO> sections = apiResponse.readEntity(new GenericType<>() {});
+                        pageState.setSections(sections);
+                        pageState.setIsCourseMode(true);
+                    } else {
+                        request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+                    }
                 }
             } else {
                 // If selecting a section
@@ -81,25 +80,12 @@ public class SelectItem extends HttpServlet {
             }
 
         } catch (Exception e) {
-            // ... or remove selection
+            // Something went wrong. Remove selection, remove sections, set to course mode.
             pageState.getCourses().resetSelected();
-            pageState.setSections(new ArrayList<>());
+            pageState.setSections(null);
             pageState.setIsCourseMode(true);
         }
 
-        forwardToJsp(request, response, navState);
-    }
-
-    /**
-     * Helper method that forwards to a JSP.
-     * @param request client request
-     * @param response response object
-     * @param navState navigation state object
-     * @throws ServletException if servlet error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
-            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

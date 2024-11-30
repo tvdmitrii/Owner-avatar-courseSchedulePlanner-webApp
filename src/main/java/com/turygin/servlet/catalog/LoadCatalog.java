@@ -24,7 +24,8 @@ import java.util.List;
 
 
 /**
- * Loads information about departments, instructors, courses, and associated sections from REST API.
+ * Main catalog servlet. Loads information about departments, instructors, courses, and associated sections
+ * from REST API.
  */
 @WebServlet(
         name = "CatalogLoadCourses",
@@ -61,54 +62,38 @@ public class LoadCatalog extends HttpServlet {
         RestClient client = (RestClient) context.getAttribute("restClient");
 
         // Fetch department info from the API
-        Response departmentsResponse = client.getAllDepartments();
-        if(RestClient.isStatusSuccess(departmentsResponse)){
-            List<DepartmentDTO> departments = departmentsResponse.readEntity(new GenericType<>() {});
-            pageState.setDepartments(departments);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(departmentsResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.getAllDepartments()) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<DepartmentDTO> departments = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setDepartments(departments);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+            }
         }
 
         // Fetch course info from the API
-        Response coursesResponse = client.getAllCourses();
-        if(RestClient.isStatusSuccess(coursesResponse)){
-            List<CourseDTO> courses = coursesResponse.readEntity(new GenericType<>() {});
-            pageState.setCourses(courses);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(coursesResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.getAllCourses()) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<CourseDTO> courses = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setCourses(courses);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+            }
         }
 
         // Fetch instructor info from the API
-        Response instructorsResponse = client.getAllInstructors();
-        if(RestClient.isStatusSuccess(instructorsResponse)){
-            List<InstructorDTO> instructors = instructorsResponse.readEntity(new GenericType<>() {});
-            pageState.setInstructors(instructors);
-        } else {
-            request.setAttribute("error", RestClient.getErrorMessage(instructorsResponse));
-            forwardToJsp(request, response, navState);
-            return;
+        try (Response apiResponse = client.getAllInstructors()) {
+            if(RestClient.isStatusSuccess(apiResponse)){
+                List<InstructorDTO> instructors = apiResponse.readEntity(new GenericType<>() {});
+                pageState.setInstructors(instructors);
+            } else {
+                request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+            }
         }
 
         // Save page state in session
         session.setAttribute("editCatalogPage", pageState);
 
-        forwardToJsp(request, response, navState);
-    }
-
-    /**
-     * Helper method that forwards to a JSP.
-     * @param request client request
-     * @param response response object
-     * @param navState navigation state object
-     * @throws ServletException if servlet error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    private void forwardToJsp(HttpServletRequest request, HttpServletResponse response, NavigationState navState)
-            throws ServletException, IOException {
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(navState.getJspPage());
         dispatcher.forward(request, response);
     }

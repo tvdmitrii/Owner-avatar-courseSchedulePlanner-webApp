@@ -45,10 +45,11 @@ public class NewItem extends HttpServlet {
         NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
+            // "action" parameter can be either "course" or "section"
             String action = request.getParameter("action");
             assert action != null;
 

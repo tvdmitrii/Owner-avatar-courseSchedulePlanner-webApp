@@ -15,7 +15,7 @@ import java.io.IOException;
 
 
 /**
- * Selects a course in cart and displays section information.
+ * Servlet that selects a course in cart and displays section information.
  */
 @WebServlet(
         name = "CartSelectCourse",
@@ -27,7 +27,7 @@ public class SelectCourse extends HttpServlet {
     public SelectCourse() {}
 
     /**
-     * Handles HTTP GET requests.
+     * Handles HTTP GET requests which contains course list ID as a query parameter.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -42,7 +42,7 @@ public class SelectCourse extends HttpServlet {
         NavigationState navState = NavigationState.CART;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
         try {

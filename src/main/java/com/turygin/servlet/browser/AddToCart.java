@@ -21,7 +21,7 @@ import java.io.IOException;
 
 
 /**
- * Adds selected course to users cart.
+ * Servlet that adds the selected course to users cart.
  */
 @WebServlet(
         name = "AddToCart",
@@ -35,7 +35,7 @@ public class AddToCart extends HttpServlet {
     public AddToCart() {}
 
     /**
-     * Handles HTTP POST requests.
+     * Handles HTTP POST requests that contains ID of the course to add to user's cart.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -50,19 +50,13 @@ public class AddToCart extends HttpServlet {
         NavigationState navState = NavigationState.BROWSER;
         session.setAttribute("navState", navState);
 
-        // Check that logged in.
+        // Web filter ensures that user has been logged in.
         UserState user = (UserState) session.getAttribute("userState");
-        if (user == null) {
-            // Not logged in.
-            LOG.warn("Unauthenticated user access.");
-            response.sendRedirect(String.format("%s/%s", request.getContextPath(), NavigationState.HOME));
-            return;
-        }
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         BrowseCoursesPageState pageState = (BrowseCoursesPageState) session.getAttribute("browseCoursesPage");
 
-        // Make sure course is selected
+        // Make sure that there is a course selected
         if (!pageState.getCourses().getHasSelected()) {
             response.sendRedirect(String.format("%s/%s", request.getContextPath(),
                     NavigationState.BROWSER.getDefaultServlet()));
@@ -70,19 +64,25 @@ public class AddToCart extends HttpServlet {
         }
 
         try {
-            // Add course to cart ...
+            // Get REST API client
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
-            Response cartAddCourseResponse =
-                    client.cartAddCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
-            if(RestClient.isStatusSuccess(cartAddCourseResponse)) {
-                CourseDTO addedCourse = cartAddCourseResponse.readEntity(CourseDTO.class);
-                request.setAttribute("success", String.format("%s has been added to cart.", addedCourse.getCode()));
-            } else {
-                request.setAttribute("error", RestClient.getErrorMessage(cartAddCourseResponse));
+
+            // Send a request to add the course to user's cart
+
+            try (Response apiResponse =
+                         client.cartAddCourse(user.getUserId(), pageState.getCourses().getSelected().getId())) {
+                // Check response
+                if(RestClient.isStatusSuccess(apiResponse)) {
+                    CourseDTO addedCourse = apiResponse.readEntity(CourseDTO.class);
+                    request.setAttribute("success",
+                            String.format("%s has been added to cart.", addedCourse.getCode()));
+                } else {
+                    request.setAttribute("error", RestClient.getErrorMessage(apiResponse));
+                }
             }
         } catch (Exception e) {
-            // ... or remove selection
+            // Something went wrong. Simply remove course selection.
             pageState.getCourses().resetSelected();
         }
 

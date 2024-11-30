@@ -21,7 +21,7 @@ import java.io.IOException;
 
 
 /**
- * Servlet for adding, updating, or removing a course.
+ * Servlet for adding, updating, or removing a courses.
  */
 @WebServlet(
         name = "CatalogEditCourse",
@@ -54,7 +54,7 @@ public class ModifyCourse extends HttpServlet {
     }
 
     /**
-     * Handles HTTP POST requests.
+     * Handles HTTP POST requests containing course information.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -69,10 +69,11 @@ public class ModifyCourse extends HttpServlet {
         NavigationState navState = NavigationState.CATALOG;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         EditCatalogPageState pageState = (EditCatalogPageState) session.getAttribute("editCatalogPage");
 
         try {
+            // "action" parameter can be either "add", "delete" or "update"
             String action = request.getParameter("action");
             assert action != null;
 
@@ -85,24 +86,26 @@ public class ModifyCourse extends HttpServlet {
                 LOG.debug("Adding course.");
                 CourseDTO submittedCourse = processFormParameters(pageState, request);
 
-                Response addCourseResponse = client.addCourse(submittedCourse);
-                if (RestClient.isStatusSuccess(addCourseResponse)) {
-                    CourseDTO newCourse = addCourseResponse.readEntity(CourseDTO.class);
-                    pageState.getCourses().getItems().add(newCourse);
-                    request.setAttribute("success", String.format("%s course has been added.",
-                            newCourse.getCode()));
-                    LOG.debug("Added course: {}", newCourse.toString());
-                } else {
-                    String error = RestClient.getErrorMessage(addCourseResponse);
-                    LOG.error(error);
-                    request.setAttribute("error", error);
+                // Send add course request
+                try (Response apiResponse = client.addCourse(submittedCourse)) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        CourseDTO newCourse = apiResponse.readEntity(CourseDTO.class);
+                        pageState.getCourses().getItems().add(newCourse);
+                        request.setAttribute("success", String.format("%s course has been added.",
+                                newCourse.getCode()));
+                        LOG.debug("Added course: {}", newCourse.toString());
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        LOG.error(error);
+                        request.setAttribute("error", error);
+                    }
                 }
 
                 forwardToJsp(request, response, navState);
                 return;
             }
 
-            // If not adding a course, ensure it is selected
+            // If not adding a course, ensure there is a selected course
             if (!pageState.getCourses().getHasSelected()) {
                 LOG.warn("Course is not selected.");
                 response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
@@ -111,34 +114,38 @@ public class ModifyCourse extends HttpServlet {
 
             // Delete course
             if (action.equals("delete")) {
-                Response removeResponse = client.deleteCourse(pageState.getCourses().getSelected().getId());
-                if (RestClient.isStatusSuccess(removeResponse)) {
-                    String courseCode = pageState.getCourses().getSelected().getCode();
-                    pageState.getCourses().removeSelected();
-                    request.setAttribute("success", String.format("%s course has been removed.",
-                            courseCode));
-                    LOG.debug("Removed course: {}", courseCode);
-                } else {
-                    String error = RestClient.getErrorMessage(removeResponse);
-                    LOG.error(error);
-                    request.setAttribute("error", error);
+                // Send delete course request
+                try (Response apiResponse = client.deleteCourse(pageState.getCourses().getSelected().getId())) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        String courseCode = pageState.getCourses().getSelected().getCode();
+                        pageState.getCourses().removeSelected();
+                        request.setAttribute("success", String.format("%s course has been removed.",
+                                courseCode));
+                        LOG.debug("Removed course: {}", courseCode);
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        LOG.error(error);
+                        request.setAttribute("error", error);
+                    }
                 }
             } else if (action.equals("update")) {
-                // Update course
+                // Construct course DTO
                 CourseDTO submittedCourse = processFormParameters(pageState, request);
                 submittedCourse.setId(pageState.getCourses().getSelected().getId());
 
-                Response updateResponse = client.updateCourse(submittedCourse);
-                if (RestClient.isStatusSuccess(updateResponse)) {
-                    CourseDTO updatedCourse = updateResponse.readEntity(CourseDTO.class);
-                    pageState.getCourses().updateSelected(updatedCourse);
-                    request.setAttribute("success", String.format("%s course has been updated.",
-                            updatedCourse.getCode()));
-                    LOG.debug("Updated course: {}", updatedCourse.toString());
-                } else {
-                    String error = RestClient.getErrorMessage(updateResponse);
-                    request.setAttribute("error", error);
-                    LOG.error(error);
+                // Send course update request
+                try (Response apiResponse = client.updateCourse(submittedCourse)) {
+                    if (RestClient.isStatusSuccess(apiResponse)) {
+                        CourseDTO updatedCourse = apiResponse.readEntity(CourseDTO.class);
+                        pageState.getCourses().updateSelected(updatedCourse);
+                        request.setAttribute("success", String.format("%s course has been updated.",
+                                updatedCourse.getCode()));
+                        LOG.debug("Updated course: {}", updatedCourse.toString());
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        request.setAttribute("error", error);
+                        LOG.error(error);
+                    }
                 }
             } else {
                 LOG.warn("Unknown action: {}.", action);

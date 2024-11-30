@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.auth0.jwk.*;
 
 /**
- *  Application startup servlet that initializes REST Client.
+ *  Application startup servlet that initializes REST Client and Cognito JWK provider.
  */
 @WebServlet(
     name = "WebAppStartup",
@@ -30,7 +30,7 @@ public class WebAppStartup extends HttpServlet {
     public WebAppStartup() {}
 
     /**
-     * Creates a REST API Client and places it into ServletContext for other servlets to use.
+     * Creates a REST API Client and Cognito JWK Provider and places them into ServletContext for other servlets to use.
      * @throws ServletException if unable to initialize servlet
      */
     public void init() throws ServletException {

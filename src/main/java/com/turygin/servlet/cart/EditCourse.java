@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Handles removing a course from the cart or updating its selected sections.
+ * Servlet that removes a course from the cart or updates course's selected sections.
  */
 @WebServlet(
         name = "CartEditCourse",
@@ -46,7 +46,7 @@ public class EditCourse extends HttpServlet {
                               RestClient client) {
         // Convert comma-delimited string to list of longs ...
         String[] idStrings = request.getParameterValues("sectionIds");
-        // If user unselects all sections, empty array will not be transmitted
+        // If user unselects all sections, empty array will not be transmitted. That is okay.
         if (idStrings == null) {
             idStrings = new String[0];
         }
@@ -55,23 +55,24 @@ public class EditCourse extends HttpServlet {
         LOG.debug("Parsed section IDs: {}", sectionIds);
 
         // Update course selection on the server
-        Response courseResponse = client.
-                cartUpdateSections(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds);
-        if(RestClient.isStatusSuccess(courseResponse)) {
-            CourseWithSectionsDTO updatedCourse = courseResponse.readEntity(CourseWithSectionsDTO.class);
-            pageState.getCourses().updateSelected(updatedCourse);
-            request.setAttribute("success", String.format("Section selection for %s has been updated.",
-                    updatedCourse.getCode()));
-            LOG.debug("Course updated: {}", updatedCourse.toString());
-        } else {
-            String error = RestClient.getErrorMessage(courseResponse);
-            LOG.error(error);
-            request.setAttribute("error", error);
+        try (Response apiResponse = client.
+                cartUpdateSections(user.getUserId(), pageState.getCourses().getSelected().getId(), sectionIds)) {
+            if(RestClient.isStatusSuccess(apiResponse)) {
+                CourseWithSectionsDTO updatedCourse = apiResponse.readEntity(CourseWithSectionsDTO.class);
+                pageState.getCourses().updateSelected(updatedCourse);
+                request.setAttribute("success", String.format("Section selection for %s has been updated.",
+                        updatedCourse.getCode()));
+                LOG.debug("Course updated: {}", updatedCourse.toString());
+            } else {
+                String error = RestClient.getErrorMessage(apiResponse);
+                LOG.error(error);
+                request.setAttribute("error", error);
+            }
         }
     }
 
     /**
-     * Handles HTTP POST requests.
+     * Handles HTTP POST requests that contain a list of selected section IDs.
      * @param request object that contains the client's request information
      * @param response object used to send the response back to the client
      * @throws ServletException if servlet error occurs
@@ -86,38 +87,43 @@ public class EditCourse extends HttpServlet {
         NavigationState navState = NavigationState.CART;
         session.setAttribute("navState", navState);
 
-        // Get page state
+        // Web filter ensures that page state was initialized.
         ViewCartPageState pageState = (ViewCartPageState) session.getAttribute("viewCartPage");
 
-        // Check that view cart page was initialized and a course is selected
+        // Check that a course is selected
         if (!pageState.getCourses().getHasSelected()) {
-            LOG.warn("Cart courses not loaded.");
+            LOG.warn("Cart course is not selected.");
             response.sendRedirect(String.format("%s/%s", request.getContextPath(), navState.getDefaultServlet()));
             return;
         }
 
         try {
+            // "action" parameter can be either "save" for updating section selection or "delete" for course removal
             String action = request.getParameter("action");
             assert action != null;
 
             // Fetch REST API client from the context
             ServletContext context = getServletContext();
             RestClient client = (RestClient) context.getAttribute("restClient");
+
+            // Web filter ensures that user has been logged in.
             UserState user = (UserState) session.getAttribute("userState");
 
             if (action.equals("save")) {
                 LOG.debug("Updating course.");
                 updateCourse(request, user, pageState, client);
             } else if (action.equals("delete")) {
-                Response removeResponse = client.cartRemoveCourse(user.getUserId(), pageState.getCourses().getSelected().getId());
-                if(RestClient.isStatusSuccess(removeResponse)) {
-                    pageState.getCourses().removeSelected();
-                    LOG.debug("Removed course.");
-                    removeResponse.close();
-                } else {
-                    String error = RestClient.getErrorMessage(removeResponse);
-                    LOG.error(error);
-                    request.setAttribute("error", error);
+                // Send a request to delete the course from cart
+                try (Response apiResponse =
+                             client.cartRemoveCourse(user.getUserId(), pageState.getCourses().getSelected().getId())) {
+                    if(RestClient.isStatusSuccess(apiResponse)) {
+                        pageState.getCourses().removeSelected();
+                        LOG.debug("Removed course.");
+                    } else {
+                        String error = RestClient.getErrorMessage(apiResponse);
+                        LOG.error(error);
+                        request.setAttribute("error", error);
+                    }
                 }
             } else {
                 LOG.warn("Unknown action: {}.", action);
