@@ -40,7 +40,7 @@
     <div class="mb-3">
       <label for="new-course-description-input" class="form-label">Description</label>
       <textarea class="form-control" id="new-course-description-input" rows="3" name="description" required>${
-        courses.hasSelected ? courses.selected.title : ""
+        courses.hasSelected ? courses.selected.description : ""
         }</textarea>
     </div>
     <%-- Course Credits Input --%>
